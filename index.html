@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Holostim — Персонаж</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1c2738 0, #050810 55%, #020308 100%);
+      color: #fff;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px);
+    }
+    header .title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f3f4f7;
+    }
+    header .subtitle {
+      font-size: 12px;
+      color: #9aa3b5;
+    }
+    header .balance {
+      font-size: 13px;
+      color: #d0e9ff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(260px, 1fr);
+      gap: 16px;
+      padding: 16px 24px 24px;
+    }
+
+    /* Левая колонка — персонаж */
+    .character-card {
+      background: rgba(10, 12, 20, 0.95);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .character-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .character-class {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9aa3b5;
+    }
+    .character-level {
+      font-size: 13px;
+      color: #ffcc33;
+    }
+    .character-body {
+      position: relative;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, #3b4a66 0, #151824 40%, #050810 100%);
+      padding: 16px;
+      min-height: 260px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .character-silhouette {
+      width: 70%;
+      max-width: 220px;
+      height: auto;
+      opacity: 0.25;
+      border-radius: 8px;
+      border: 1px dashed rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #9aa3b5;
+      padding: 12px;
+      text-align: center;
+    }
+    .avatar-wrapper {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid #ffcc33;
+      overflow: hidden;
+      background: #111520;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #9aa3b5;
+    }
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .upload-avatar-btn {
+      position: absolute;
+      top: 96px;
+      left: 16px;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.6);
+      cursor: pointer;
+    }
+    .upload-avatar-btn input {
+      display: none;
+    }
+    .upload-avatar-btn span {
+      pointer-events: none;
+    }
+
+    .character-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .xp-bar-label {
+      font-size: 12px;
+      color: #9aa3b5;
+      display: flex;
+      justify-content: space-between;
+    }
+    .xp-bar {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: #151824;
+      overflow: hidden;
+    }
+    .xp-bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 42%;
+      background: linear-gradient(90deg, #ffcc33, #ff7a2f);
+    }
+    .character-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .btn-primary {
+      flex: 2;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg, #ffcc33, #ff9540);
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-ghost {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.24);
+      background: transparent;
+      color: #e1e4f0;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Правая колонка — оружие / статы / ачивки */
+    .right-column {
+      display: grid;
+      grid-template-rows: minmax(200px, 1.2fr) minmax(140px, 0.8fr);
+      gap: 12px;
+    }
+
+    .panel {
+      background: rgba(10, 12, 20, 0.95);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .panel-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9aa3b5;
+    }
+    .panel-subtitle {
+      font-size: 11px;
+      color: #5f6a81;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 14px;
+      margin-top: 6px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #cfd5e6;
+    }
+    .stat-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+      color: #7f8aa1;
+    }
+    .stat-value {
+      font-weight: 600;
+      color: #f3f4f7;
+    }
+
+    .achievements-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .ach-badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(20, 24, 38, 0.9);
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ach-badge span {
+      font-size: 13px;
+    }
+    .ach-badge.gold {
+      border-color: #ffcc33;
+    }
+    .ach-badge.silver {
+      border-color: #8aa4ff;
+    }
+    .ach-badge.bronze {
+      border-color: #ff914d;
+    }
+
+    @media (max-width: 780px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .right-column {
+        grid-template-rows: auto auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="title">Holostim</div>
+    <div class="subtitle">Профиль стрелка · Личный склад</div>
+  </div>
+  <div class="balance">
+    Уровень 5 · 1 280 опыта / 3 000 · Тариф: Боец
+  </div>
+</header>
+
+<main class="layout">
+  <!-- Левая колонка: персонаж -->
+  <section class="character-card">
+    <div class="character-header">
+      <div class="character-class">Снайпер / Полигон</div>
+      <div class="character-level">LVL 5 · Боец</div>
+    </div>
+
+    <div class="character-body">
+      <div class="avatar-wrapper" id="avatar">
+        <!-- Пока заглушка текста; позже сюда подставим фото -->
+        Лицо
+      </div>
+      <label class="upload-avatar-btn">
+        <input type="file" accept="image/*" id="avatarInput">
+        <span>Загрузить фото</span>
+      </label>
+
+      <div class="character-silhouette">
+        Тут будет модель бойца.<br>
+        Пока просто пустой силуэт.
+      </div>
+    </div>
+
+    <div class="character-footer">
+      <div class="xp-bar-label">
+        <span>Прогресс до след. уровня</span>
+        <span>1 280 / 3 000 XP</span>
+      </div>
+      <div class="xp-bar">
+        <div class="xp-bar-fill"></div>
+      </div>
+      <div class="character-actions">
+        <button class="btn-primary">На рубеж · начать сессию</button>
+        <button class="btn-ghost">Тарифы</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Правая колонка: статы и ачивки -->
+  <section class="right-column">
+    <!-- Статы / оружие -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Статы и сессии</div>
+          <div class="panel-subtitle">Здесь будет подтягиваться реальная статистика из Holostim</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-row">
+          <div class="stat-label">Точность</div>
+          <div class="stat-value">78%</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Выстрелов всего</div>
+          <div class="stat-value">3 450</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Сессий</div>
+          <div class="stat-value">42</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Сред. время реакции</div>
+          <div class="stat-value">0.41 c</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Лучший стрик</div>
+          <div class="stat-value">17 попаданий</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Последний визит</div>
+          <div class="stat-value">вчера</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ачивки -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Ачивки</div>
+          <div class="panel-subtitle">Открывай новые значки за прогресс на полигоне</div>
+        </div>
+      </div>
+
+      <div class="achievements-list">
+        <div class="ach-badge gold">
+          ⭐ <span>«Новобранец»</span>
+        </div>
+        <div class="ach-badge silver">
+          🎯 <span>«Меткий стрелок»</span>
+        </div>
+        <div class="ach-badge bronze">
+          🔥 <span>«Серия 10»</span>
+        </div>
+        <div class="ach-badge">
+          ⏱ <span>«Молниеносный»</span>
+        </div>
+        <div class="ach-badge">
+          🎮 <span>«Ветеран полигона»</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Простейшая загрузка аватарки только на фронте
+  const avatarInput = document.getElementById('avatarInput');
+  const avatar = document.getElementById('avatar');
+
+  avatarInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      avatar.innerHTML = "";
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      avatar.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+</script>
+
+</body>
+</html>
