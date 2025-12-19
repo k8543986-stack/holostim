@@ -97,7 +97,7 @@
       gap: 20px;
     }
 
-    /* Левая колонка — солдат */
+    /* Левая колонка — персонаж */
     .character-card {
       background: rgba(10, 12, 20, 0.8);
       border-radius: 20px;
@@ -114,7 +114,7 @@
       align-items: center;
     }
     .character-class {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: #9aa3b5;
@@ -127,23 +127,34 @@
     .character-body {
       position: relative;
       border-radius: 16px;
-      background: radial-gradient(circle at 50% 30%, #2a354d 0%, #0a0c14 70%);
-      height: 380px;
+      background: radial-gradient(circle at 50% 30%, #2a354d 0%, #0a0c14 100%);
+      height: 420px;
       overflow: hidden;
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       justify-content: center;
       border: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* Силуэт солдата */
-    .soldier-svg {
-      width: 85%;
-      height: auto;
-      fill: rgba(255,255,255,0.15);
-      filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
-      margin-bottom: -10px;
-      pointer-events: none;
+    /* Арт персонажа */
+    .soldier-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 22% center; /* Смещаем, чтобы показать мужского персонажа */
+      filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+      opacity: 0.9;
+    }
+    
+    /* Затемнение внизу персонажа для читаемости */
+    .character-body::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to top, #0a0c14 0%, transparent 100%);
     }
 
     .avatar-wrapper {
@@ -154,7 +165,7 @@
       height: 80px;
       border-radius: 50%;
       border: 3px solid #ffcc33;
-      box-shadow: 0 0 15px rgba(255, 204, 51, 0.3);
+      box-shadow: 0 0 15px rgba(255, 204, 51, 0.4);
       overflow: hidden;
       background: #111520;
       display: flex;
@@ -187,13 +198,16 @@
     .character-footer {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .xp-bar-label {
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 600;
       color: #9aa3b5;
       display: flex;
       justify-content: space-between;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .xp-bar {
       height: 8px;
@@ -209,18 +223,20 @@
     }
     .btn-primary {
       width: 100%;
-      padding: 14px;
+      padding: 16px;
       border-radius: 12px;
       border: none;
       background: linear-gradient(135deg, #ffcc33, #ff9540);
       color: #000;
-      font-size: 14px;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(255, 149, 64, 0.3);
+      box-shadow: 0 4px 20px rgba(255, 149, 64, 0.4);
+      transition: transform 0.1s;
     }
+    .btn-primary:active { transform: scale(0.98); }
 
     /* Правая колонка */
     .right-column {
@@ -232,61 +248,67 @@
       background: rgba(10, 12, 20, 0.6);
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.08);
-      padding: 16px;
+      padding: 18px;
     }
     .panel-title {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #9aa3b5;
-      margin-bottom: 12px;
+      letter-spacing: 0.12em;
+      color: #7f8aa1;
+      margin-bottom: 14px;
+      border-left: 3px solid #ffcc33;
+      padding-left: 10px;
     }
 
     .modes-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 14px;
     }
     .mode-card {
       background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
       cursor: pointer;
       transition: 0.2s;
     }
     .mode-card:hover {
-      background: rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.06);
       border-color: #ffcc33;
+      transform: translateY(-2px);
     }
-    .mode-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .mode-desc { font-size: 11px; color: #7f8aa1; line-height: 1.4; }
+    .mode-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #fff; }
+    .mode-desc { font-size: 11px; color: #9aa3b5; line-height: 1.5; }
 
     .achievements-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
     .ach-badge {
-      padding: 8px 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.05);
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.1);
       font-size: 12px;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
+      transition: 0.2s;
     }
-    .ach-badge.gold { border-color: rgba(255, 204, 51, 0.4); color: #ffcc33; }
+    .ach-badge:hover { background: rgba(255,255,255,0.08); border-color: #ffcc33; }
+    .ach-badge.gold { border-color: rgba(255, 204, 51, 0.5); color: #ffcc33; }
 
     @media (max-width: 780px) {
       .layout { grid-template-columns: 1fr; }
-      .character-body { height: 320px; }
+      .character-body { height: 380px; }
       .modes-grid { grid-template-columns: 1fr; }
-      header { flex-direction: column; align-items: flex-start; }
-      header .balance { text-align: left; margin-top: 5px; }
+      header { flex-direction: column; align-items: flex-start; gap: 4px; }
+      header .balance { text-align: left; }
     }
   </style>
 </head>
@@ -298,7 +320,7 @@
     <div class="subtitle">Профиль стрелка · Личный склад</div>
   </div>
   <div class="balance" id="tg-balance">
-    Загрузка данных...
+    Загрузка профиля...
   </div>
 </header>
 
@@ -311,80 +333,78 @@
 <main>
   <section class="tab-content active" id="tab-sklad">
     <div class="layout">
-      <!-- Солдат -->
+      <!-- Блок персонажа -->
       <div class="character-card">
         <div class="character-header">
-          <span class="character-class">Снайпер / Полигон</span>
+          <span class="character-class">Штурмовик / Полигон</span>
           <span class="character-level" id="char-lvl">LVL 5 · Боец</span>
         </div>
 
         <div class="character-body">
           <div class="avatar-wrapper" id="avatar">
-            <span style="color: #4a5568; font-size: 12px;">ЛИЦО</span>
+            <span style="color: #4a5568; font-size: 11px; font-weight: 800;">FACE ID</span>
           </div>
           <label class="upload-avatar-btn">
             <input type="file" accept="image/*" id="avatarInput">
-            Загрузить фото
+            Сменить фото
           </label>
 
-          <!-- SVG Силуэт солдата -->
-          <svg class="soldier-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M10.5,7H13.5A2,2 0 0,1 15.5,9V14.5H14V22H10V14.5H8.5V9A2,2 0 0,1 10.5,7Z" />
-            <path d="M12,2C10.89,2 10,2.89 10,4C10,5.11 10.89,6 12,6C13.11,6 14,5.11 14,4C14,2.89 13.11,2 12,2M19,10V12H16V22H14V15H10V22H8V12H5V10H19M12,8C10.5,8 9.22,8.89 8.65,10.18L7.38,13.06L6.11,15.94L5,18.47V22H3V18L4.25,15.15L5.5,12.31L6.75,9.46C7.5,7.75 9.25,6.5 11.25,6.5H12.75C14.75,6.5 16.5,7.75 17.25,9.46L18.5,12.31L19.75,15.15L21,18V22H19V18.47L17.89,15.94L16.62,13.06L15.35,10.18C14.78,8.89 13.5,8 12,8Z" opacity="0.3"/>
-          </svg>
+          <!-- Арт персонажа с ArtStation -->
+          <img class="soldier-art" src="https://cdna.artstation.com/p/assets/images/images/064/963/400/large/sunstrike-studios-warface-portfolio-pack-04-artstation-01-1.jpg?1689173514" alt="Soldier">
         </div>
 
         <div class="character-footer">
           <div class="xp-bar-label">
-            <span>Опыт до LVL 6</span>
+            <span>Опыт до уровня 6</span>
             <span>1280 / 3000 XP</span>
           </div>
           <div class="xp-bar">
             <div class="xp-bar-fill"></div>
           </div>
-          <button class="btn-primary" id="playBtn">На рубеж · Играть</button>
+          <button class="btn-primary" id="playBtn">На рубеж · Огонь!</button>
         </div>
       </div>
 
-      <!-- Контент -->
+      <!-- Контентная часть -->
       <div class="right-column">
         <div class="panel">
-          <div class="panel-title">Режимы тренировки</div>
+          <div class="panel-title">Доступные режимы</div>
           <div class="modes-grid">
-            <div class="mode-card" onclick="showInfo('Стандартная сессия: 30 выстрелов на точность.')">
-              <div class="mode-title">Стандарт</div>
-              <div class="mode-desc">Классический полигон, 30 мишеней.</div>
+            <div class="mode-card" onclick="showInfo('Стандарт: 30 мишеней, время не ограничено. Идеально для разминки.')">
+              <div class="mode-title">Мишени</div>
+              <div class="mode-desc">Классическая стрельба по статичным целям.</div>
             </div>
-            <div class="mode-card" onclick="showInfo('Реакция: мишени исчезают через 0.5 сек!')">
-              <div class="mode-title">Реакция</div>
-              <div class="mode-desc">Тренировка скорости принятия решения.</div>
+            <div class="mode-card" onclick="showInfo('Реакция: мишени появляются на 0.7 сек. Успей поразить всех!')">
+              <div class="mode-title">Блиц</div>
+              <div class="mode-desc">Динамическая тренировка скорости реакции.</div>
             </div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-title">Достижения</div>
+          <div class="panel-title">Медали и почести</div>
           <div class="achievements-list">
-            <div class="ach-badge gold" onclick="showInfo('Ачивка получена за регистрацию!')">⭐ Новобранец</div>
-            <div class="ach-badge" onclick="showInfo('Нужно 10 попаданий в голову подряд.')">🎯 Снайпер</div>
-            <div class="ach-badge" onclick="showInfo('Сыграйте 100 сессий.')">🔥 Ветеран</div>
+            <div class="ach-badge gold" onclick="showInfo('Выдано за первый вход в систему Holostim.')">⭐ Первенец</div>
+            <div class="ach-badge" onclick="showInfo('Поразите 10 целей в голову подряд.')">🎯 Глаз алмаз</div>
+            <div class="ach-badge" onclick="showInfo('Сыграйте сессию в ночном режиме.')">🌙 Ночной охотник</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Заглушки для других вкладок -->
   <section class="tab-content" id="tab-progress">
-    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: center;">
-      <h3>Статистика</h3>
-      <p style="color: #7f8aa1;">Здесь будут графики твоих попаданий за неделю.</p>
+    <div style="padding: 40px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px; text-align: center;">
+      <h3 style="color: #ffcc33;">Архив данных</h3>
+      <p style="color: #7f8aa1;">Здесь будет храниться история твоих выстрелов и прогресс точности.</p>
     </div>
   </section>
 
   <section class="tab-content" id="tab-shop">
-    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: center;">
-      <h3>Магазин</h3>
-      <p style="color: #7f8aa1;">Покупка тарифов «Боец» и «Ветеран» будет доступна скоро.</p>
+    <div style="padding: 40px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px; text-align: center;">
+      <h3 style="color: #ffcc33;">Арсенал</h3>
+      <p style="color: #7f8aa1;">Магазин подписок и дополнительных режимов в разработке.</p>
     </div>
   </section>
 </main>
@@ -394,7 +414,7 @@
   tg.ready();
   tg.expand();
 
-  // Подстановка данных из TG
+  // Автоподстановка данных пользователя
   const user = tg.initDataUnsafe?.user;
   if (user) {
     document.getElementById('tg-balance').textContent = `@${user.username || user.first_name} · id ${user.id}`;
@@ -405,17 +425,18 @@
     tg.showAlert(text);
   }
 
-  // Переключение вкладок
+  // Логика переключения вкладок
   document.querySelectorAll('.tab').forEach(button => {
     button.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       button.classList.add('active');
       document.getElementById('tab-' + button.dataset.tab).classList.add('active');
+      tg.HapticFeedback.impactOccurred('light');
     });
   });
 
-  // Загрузка фото
+  // Загрузка аватарки
   const avatarInput = document.getElementById('avatarInput');
   const avatar = document.getElementById('avatar');
   avatarInput.addEventListener('change', (e) => {
@@ -429,7 +450,10 @@
     }
   });
 
-  document.getElementById('playBtn').onclick = () => showInfo('Запуск сессии... Подключитесь к рубежу!');
+  document.getElementById('playBtn').onclick = () => {
+    tg.HapticFeedback.notificationOccurred('success');
+    showInfo('Боевая готовность! Подключайтесь к рубежу через терминал.');
+  };
 </script>
 </body>
 </html>
