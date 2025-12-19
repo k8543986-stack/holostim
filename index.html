@@ -15,6 +15,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #1c2738 0, #050810 55%, #020308 100%);
       color: #fff;
+      overflow-x: hidden;
     }
 
     /* Шапка */
@@ -26,9 +27,6 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
       background: rgba(0,0,0,0.5);
       backdrop-filter: blur(8px);
-    }
-    header-left {
-      display: block;
     }
     header .title {
       font-size: 18px;
@@ -53,11 +51,11 @@
       gap: 8px;
       padding: 8px 20px 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
-      background: linear-gradient(to right, rgba(5,8,16,0.95), rgba(10,12,22,0.95));
+      background: rgba(5,8,16,0.6);
     }
     .top-tabs .tab {
       position: relative;
-      padding: 6px 14px 10px;
+      padding: 8px 14px 12px;
       border: none;
       background: transparent;
       color: #9aa3b5;
@@ -65,6 +63,7 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
+      transition: color 0.2s;
     }
     .top-tabs .tab.active {
       color: #ffcc33;
@@ -72,16 +71,16 @@
     .top-tabs .tab.active::after {
       content: "";
       position: absolute;
-      left: 10%;
-      right: 10%;
+      left: 0;
+      right: 0;
       bottom: 0;
-      height: 2px;
+      height: 3px;
       background: linear-gradient(90deg, #ffcc33, #ff7a2f);
-      border-radius: 999px;
+      box-shadow: 0 -2px 10px rgba(255, 204, 51, 0.4);
     }
 
     main {
-      padding: 12px 20px 20px;
+      padding: 16px 20px;
     }
 
     .tab-content {
@@ -94,19 +93,20 @@
     /* Лейаут вкладки "СКЛАД" */
     .layout {
       display: grid;
-      grid-template-columns: minmax(260px, 340px) minmax(260px, 1fr);
-      gap: 16px;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
     }
 
     /* Левая колонка — солдат */
     .character-card {
-      background: rgba(10, 12, 20, 0.95);
-      border-radius: 16px;
+      background: rgba(10, 12, 20, 0.8);
+      border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.08);
-      padding: 16px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     .character-header {
       display: flex;
@@ -114,56 +114,53 @@
       align-items: center;
     }
     .character-class {
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: #9aa3b5;
     }
     .character-level {
-      font-size: 13px;
+      font-size: 14px;
+      font-weight: 700;
       color: #ffcc33;
     }
     .character-body {
       position: relative;
-      border-radius: 14px;
-      background: radial-gradient(circle at top, #3b4a66 0, #151824 40%, #050810 100%);
-      padding: 16px;
-      min-height: 260px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 50% 30%, #2a354d 0%, #0a0c14 70%);
+      height: 380px;
       overflow: hidden;
       display: flex;
       align-items: flex-end;
       justify-content: center;
+      border: 1px solid rgba(255,255,255,0.05);
     }
-    .character-silhouette {
-      width: 70%;
-      max-width: 220px;
+
+    /* Силуэт солдата */
+    .soldier-svg {
+      width: 85%;
       height: auto;
-      opacity: 0.25;
-      border-radius: 8px;
-      border: 1px dashed rgba(255,255,255,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: #9aa3b5;
-      padding: 12px;
-      text-align: center;
+      fill: rgba(255,255,255,0.15);
+      filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+      margin-bottom: -10px;
+      pointer-events: none;
     }
+
     .avatar-wrapper {
       position: absolute;
       top: 16px;
       left: 16px;
-      width: 72px;
-      height: 72px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       border: 3px solid #ffcc33;
+      box-shadow: 0 0 15px rgba(255, 204, 51, 0.3);
       overflow: hidden;
       background: #111520;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
-      color: #9aa3b5;
+      z-index: 10;
     }
     .avatar-wrapper img {
       width: 100%;
@@ -172,26 +169,25 @@
     }
     .upload-avatar-btn {
       position: absolute;
-      top: 96px;
+      top: 104px;
       left: 16px;
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.3);
-      background: rgba(0,0,0,0.6);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0,0,0,0.7);
       cursor: pointer;
+      z-index: 10;
+      backdrop-filter: blur(4px);
     }
-    .upload-avatar-btn input {
-      display: none;
-    }
-    .upload-avatar-btn span {
-      pointer-events: none;
-    }
+    .upload-avatar-btn input { display: none; }
 
     .character-footer {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .xp-bar-label {
       font-size: 12px;
@@ -200,220 +196,97 @@
       justify-content: space-between;
     }
     .xp-bar {
-      position: relative;
-      height: 10px;
-      border-radius: 999px;
+      height: 8px;
+      border-radius: 10px;
       background: #151824;
       overflow: hidden;
     }
     .xp-bar-fill {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 42%;
+      height: 100%;
+      width: 45%;
       background: linear-gradient(90deg, #ffcc33, #ff7a2f);
-      transition: width 0.6s ease-out;
-    }
-    .character-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
+      box-shadow: 0 0 10px rgba(255, 122, 47, 0.5);
     }
     .btn-primary {
-      flex: 2;
-      padding: 8px 12px;
-      border-radius: 999px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
       border: none;
-      background: linear-gradient(90deg, #ffcc33, #ff9540);
+      background: linear-gradient(135deg, #ffcc33, #ff9540);
       color: #000;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       cursor: pointer;
-    }
-    .btn-ghost {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.24);
-      background: transparent;
-      color: #e1e4f0;
-      font-size: 12px;
-      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 149, 64, 0.3);
     }
 
-    /* Правая часть вкладки "СКЛАД" */
+    /* Правая колонка */
     .right-column {
-      display: grid;
-      grid-template-rows: minmax(180px, 1.1fr) minmax(140px, 0.9fr);
-      gap: 12px;
-    }
-
-    .panel {
-      background: rgba(10, 12, 20, 0.95);
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 20px;
     }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+    .panel {
+      background: rgba(10, 12, 20, 0.6);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 16px;
     }
     .panel-title {
       font-size: 14px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: #9aa3b5;
-    }
-    .panel-subtitle {
-      font-size: 11px;
-      color: #5f6a81;
+      margin-bottom: 12px;
     }
 
-    /* Карточки режимов */
     .modes-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin-top: 4px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
     .mode-card {
-      background: rgba(20, 24, 38, 0.9);
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 12px;
       cursor: pointer;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
+      transition: 0.2s;
     }
     .mode-card:hover {
+      background: rgba(255,255,255,0.07);
       border-color: #ffcc33;
-      box-shadow: 0 0 10px rgba(255,204,51,0.25);
-      transform: translateY(-1px);
     }
-    .mode-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #f3f4f7;
-    }
-    .mode-meta {
-      font-size: 11px;
-      color: #9aa3b5;
-    }
+    .mode-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .mode-desc { font-size: 11px; color: #7f8aa1; line-height: 1.4; }
 
-    /* Ачивки */
     .achievements-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 4px;
+      gap: 10px;
     }
     .ach-badge {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(20, 24, 38, 0.9);
-      font-size: 11px;
-      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease;
     }
-    .ach-badge span {
-      font-size: 13px;
-    }
-    .ach-badge.gold {
-      border-color: #ffcc33;
-    }
-    .ach-badge.silver {
-      border-color: #8aa4ff;
-    }
-    .ach-badge.bronze {
-      border-color: #ff914d;
-    }
-    .ach-badge:hover {
-      background: rgba(35, 40, 60, 0.95);
-    }
-
-    /* Вкладка "Прогресс" */
-    .placeholder-card {
-      background: rgba(10, 12, 20, 0.95);
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 16px;
-      font-size: 14px;
-      color: #cfd5e6;
-    }
+    .ach-badge.gold { border-color: rgba(255, 204, 51, 0.4); color: #ffcc33; }
 
     @media (max-width: 780px) {
-      header {
-        padding: 8px 12px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-      header .title {
-        font-size: 16px;
-      }
-      header .subtitle {
-        font-size: 11px;
-      }
-      header .balance {
-        font-size: 12px;
-        text-align: left;
-      }
-
-      .top-tabs {
-        padding: 6px 8px 0;
-        overflow-x: auto;
-      }
-      .top-tabs .tab {
-        padding: 4px 10px 8px;
-        font-size: 12px;
-      }
-
-      main {
-        padding: 10px 8px 16px;
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .character-card {
-        padding: 12px;
-      }
-
-      .character-body {
-        min-height: 220px;
-        padding: 12px;
-      }
-
-      .right-column {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .panel {
-        padding: 10px 12px;
-      }
-
-      .modes-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .character-actions .btn-primary,
-      .character-actions .btn-ghost {
-        font-size: 12px;
-        padding: 8px 10px;
-      }
+      .layout { grid-template-columns: 1fr; }
+      .character-body { height: 320px; }
+      .modes-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+      header .balance { text-align: left; margin-top: 5px; }
     }
   </style>
 </head>
@@ -424,8 +297,8 @@
     <div class="title">HOLOSTIM</div>
     <div class="subtitle">Профиль стрелка · Личный склад</div>
   </div>
-  <div class="balance">
-    Уровень 5 · 1 280 опыта / 3 000 · Тариф: Боец
+  <div class="balance" id="tg-balance">
+    Загрузка данных...
   </div>
 </header>
 
@@ -436,264 +309,127 @@
 </nav>
 
 <main>
-  <!-- Вкладка СКЛАД -->
   <section class="tab-content active" id="tab-sklad">
     <div class="layout">
-      <!-- Левая колонка: персонаж -->
-      <section class="character-card">
+      <!-- Солдат -->
+      <div class="character-card">
         <div class="character-header">
-          <div class="character-class">Снайпер / Полигон</div>
-          <div class="character-level">LVL 5 · Боец</div>
+          <span class="character-class">Снайпер / Полигон</span>
+          <span class="character-level" id="char-lvl">LVL 5 · Боец</span>
         </div>
 
         <div class="character-body">
           <div class="avatar-wrapper" id="avatar">
-            Лицо
+            <span style="color: #4a5568; font-size: 12px;">ЛИЦО</span>
           </div>
           <label class="upload-avatar-btn">
             <input type="file" accept="image/*" id="avatarInput">
-            <span>Загрузить фото</span>
+            Загрузить фото
           </label>
 
-          <div class="character-silhouette">
-            Тут будет модель бойца.<br>
-            Пока просто пустой силуэт.
-          </div>
+          <!-- SVG Силуэт солдата -->
+          <svg class="soldier-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M10.5,7H13.5A2,2 0 0,1 15.5,9V14.5H14V22H10V14.5H8.5V9A2,2 0 0,1 10.5,7Z" />
+            <path d="M12,2C10.89,2 10,2.89 10,4C10,5.11 10.89,6 12,6C13.11,6 14,5.11 14,4C14,2.89 13.11,2 12,2M19,10V12H16V22H14V15H10V22H8V12H5V10H19M12,8C10.5,8 9.22,8.89 8.65,10.18L7.38,13.06L6.11,15.94L5,18.47V22H3V18L4.25,15.15L5.5,12.31L6.75,9.46C7.5,7.75 9.25,6.5 11.25,6.5H12.75C14.75,6.5 16.5,7.75 17.25,9.46L18.5,12.31L19.75,15.15L21,18V22H19V18.47L17.89,15.94L16.62,13.06L15.35,10.18C14.78,8.89 13.5,8 12,8Z" opacity="0.3"/>
+          </svg>
         </div>
 
         <div class="character-footer">
           <div class="xp-bar-label">
-            <span>Прогресс до след. уровня</span>
-            <span>1 280 / 3 000 XP</span>
+            <span>Опыт до LVL 6</span>
+            <span>1280 / 3000 XP</span>
           </div>
           <div class="xp-bar">
             <div class="xp-bar-fill"></div>
           </div>
-          <div class="character-actions">
-            <button class="btn-primary" id="startSessionBtn">На рубеж · начать сессию</button>
-            <button class="btn-ghost" id="tariffsBtn">Тарифы</button>
-          </div>
+          <button class="btn-primary" id="playBtn">На рубеж · Играть</button>
         </div>
-      </section>
+      </div>
 
-      <!-- Правая часть: режимы + ачивки -->
-      <section class="right-column">
-        <!-- Режимы -->
+      <!-- Контент -->
+      <div class="right-column">
         <div class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="panel-title">Режимы тренировки</div>
-              <div class="panel-subtitle">Выбери, как сегодня будешь качать скилл</div>
-            </div>
-          </div>
-
+          <div class="panel-title">Режимы тренировки</div>
           <div class="modes-grid">
-            <div class="mode-card" data-mode="standard">
-              <div class="mode-title">Стандартная сессия</div>
-              <div class="mode-meta">30 выстрелов · базовый режим полигона</div>
+            <div class="mode-card" onclick="showInfo('Стандартная сессия: 30 выстрелов на точность.')">
+              <div class="mode-title">Стандарт</div>
+              <div class="mode-desc">Классический полигон, 30 мишеней.</div>
             </div>
-            <div class="mode-card" data-mode="reaction">
-              <div class="mode-title">Реакция и рефлексы</div>
-              <div class="mode-meta">быстрые вспышки целей, упор на время реакции</div>
-            </div>
-            <div class="mode-card" data-mode="duel">
-              <div class="mode-title">Дуэль</div>
-              <div class="mode-meta">1 на 1 · сравнение точности и скорости с другом</div>
-            </div>
-            <div class="mode-card" data-mode="night">
-              <div class="mode-title">Ночной полигон</div>
-              <div class="mode-meta">слабое освещение, штраф к видимости, бонус к опыту</div>
+            <div class="mode-card" onclick="showInfo('Реакция: мишени исчезают через 0.5 сек!')">
+              <div class="mode-title">Реакция</div>
+              <div class="mode-desc">Тренировка скорости принятия решения.</div>
             </div>
           </div>
         </div>
 
-        <!-- Ачивки -->
         <div class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="panel-title">Ачивки</div>
-              <div class="panel-subtitle">Открывай значки за прогресс и точность</div>
-            </div>
-          </div>
-
+          <div class="panel-title">Достижения</div>
           <div class="achievements-list">
-            <div class="ach-badge gold" data-ach="rookie">
-              ⭐ <span>«Новобранец»</span>
-            </div>
-            <div class="ach-badge silver" data-ach="sharpshooter">
-              🎯 <span>«Меткий стрелок»</span>
-            </div>
-            <div class="ach-badge bronze" data-ach="streak10">
-              🔥 <span>«Серия 10»</span>
-            </div>
-            <div class="ach-badge" data-ach="speed">
-              ⏱ <span>«Молниеносный»</span>
-            </div>
-            <div class="ach-badge" data-ach="veteran">
-              🎮 <span>«Ветеран полигона»</span>
-            </div>
+            <div class="ach-badge gold" onclick="showInfo('Ачивка получена за регистрацию!')">⭐ Новобранец</div>
+            <div class="ach-badge" onclick="showInfo('Нужно 10 попаданий в голову подряд.')">🎯 Снайпер</div>
+            <div class="ach-badge" onclick="showInfo('Сыграйте 100 сессий.')">🔥 Ветеран</div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   </section>
 
-  <!-- Вкладка ПРОГРЕСС -->
   <section class="tab-content" id="tab-progress">
-    <div class="placeholder-card">
-      <h3 style="margin-top:0;">Прогресс</h3>
-      <p>
-        Здесь позже появится история сессий, графики точности и времени реакции.
-        Можно будет фильтровать по датам и режимам.
-      </p>
+    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: center;">
+      <h3>Статистика</h3>
+      <p style="color: #7f8aa1;">Здесь будут графики твоих попаданий за неделю.</p>
     </div>
   </section>
 
-  <!-- Вкладка МАГАЗИН -->
   <section class="tab-content" id="tab-shop">
-    <div class="placeholder-card">
-      <h3 style="margin-top:0;">Магазин и подписки</h3>
-      <p>
-        Сюда перенесём тарифы «Гость / Боец / Ветеран» и покупку сессий.
-        Пока используй команды в Telegram-боте.
-      </p>
+    <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: center;">
+      <h3>Магазин</h3>
+      <p style="color: #7f8aa1;">Покупка тарифов «Боец» и «Ветеран» будет доступна скоро.</p>
     </div>
   </section>
 </main>
 
 <script>
-  // Загрузка аватарки
-  const avatarInput = document.getElementById('avatarInput');
-  const avatar = document.getElementById('avatar');
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
 
-  if (avatarInput) {
-    avatarInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+  // Подстановка данных из TG
+  const user = tg.initDataUnsafe?.user;
+  if (user) {
+    document.getElementById('tg-balance').textContent = `@${user.username || user.first_name} · id ${user.id}`;
+    document.getElementById('char-lvl').textContent = `LVL 5 · ${user.first_name}`;
+  }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        avatar.innerHTML = "";
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        avatar.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    });
+  function showInfo(text) {
+    tg.showAlert(text);
   }
 
   // Переключение вкладок
-  const tabs = document.querySelectorAll('.top-tabs .tab');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const tabId = tab.dataset.tab;
-
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      tabContents.forEach(c => {
-        c.classList.toggle('active', c.id === `tab-${tabId}`);
-      });
+  document.querySelectorAll('.tab').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      button.classList.add('active');
+      document.getElementById('tab-' + button.dataset.tab).classList.add('active');
     });
   });
 
-  // Интеграция с Telegram Mini App
-  const tg = window.Telegram?.WebApp;
-
-  if (tg) {
-    tg.ready();
-
-    const initDataUnsafe = tg.initDataUnsafe || {};
-    const user = initDataUnsafe.user || null;
-
-    const headerBalance = document.querySelector('header .balance');
-    const charHeaderLevel = document.querySelector('.character-level');
-
-    if (user) {
-      const username = user.username || (user.first_name + (user.last_name ? ' ' + user.last_name : ''));
-
-      if (headerBalance) {
-        headerBalance.textContent = `@${username} · id ${user.id} · Тариф: Боец (пока заглушка)`;
-      }
-      if (charHeaderLevel) {
-        charHeaderLevel.textContent = `LVL 5 · ${username}`;
-      }
-    } else {
-      if (headerBalance) {
-        headerBalance.textContent = 'Локальный режим · страница открыта не из Telegram';
-      }
+  // Загрузка фото
+  const avatarInput = document.getElementById('avatarInput');
+  const avatar = document.getElementById('avatar');
+  avatarInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        avatar.innerHTML = `<img src="${event.target.result}">`;
+      };
+      reader.readAsDataURL(file);
     }
+  });
 
-    // Кнопки
-    const startBtn = document.getElementById('startSessionBtn');
-    const tariffsBtn = document.getElementById('tariffsBtn');
-
-    if (startBtn) {
-      startBtn.addEventListener('click', () => {
-        tg.showAlert('Здесь будет запуск сессии на полигоне Holostim.');
-      });
-    }
-
-    if (tariffsBtn) {
-      tariffsBtn.addEventListener('click', () => {
-        tg.showAlert('Здесь позже откроется экран с тарифами и подписками.');
-      });
-    }
-
-    // Клики по режимам
-    document.querySelectorAll('.mode-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = card.dataset.mode;
-        let text = '';
-
-        if (id === 'standard') {
-          text = 'Стандартная сессия: 30 выстрелов, базовый режим для разогрева.';
-        } else if (id === 'reaction') {
-          text = 'Реакция и рефлексы: короткие вспышки целей, фокус на времени реакции.';
-        } else if (id === 'duel') {
-          text = 'Дуэль: сравнение точности и скорости с другим стрелком.';
-        } else if (id === 'night') {
-          text = 'Ночной полигон: слабое освещение и бонус к опыту за усложнение условий.';
-        } else {
-          text = 'Режим тренировки.';
-        }
-
-        tg.showAlert(text);
-      });
-    });
-
-    // Клики по ачивкам
-    document.querySelectorAll('.ach-badge').forEach(badge => {
-      badge.addEventListener('click', () => {
-        const id = badge.dataset.ach;
-        let text = '';
-
-        if (id === 'rookie') {
-          text = '«Новобранец»: пройди первую сессию на полигоне.';
-        } else if (id === 'sharpshooter') {
-          text = '«Меткий стрелок»: добейся точности выше 80% в одной сессии.';
-        } else if (id === 'streak10') {
-          text = '«Серия 10»: 10 попаданий подряд без промахов.';
-        } else if (id === 'speed') {
-          text = '«Молниеносный»: среднее время реакции меньше 0.35 секунды.';
-        } else if (id === 'veteran') {
-          text = '«Ветеран полигона»: 100+ сессий на аккаунте.';
-        } else {
-          text = 'Ачивка Holostim.';
-        }
-
-        tg.showAlert(text);
-      });
-    });
-  } else {
-    const headerBalance = document.querySelector('header .balance');
-    if (headerBalance) {
-      headerBalance.textContent = 'Локальный режим · нет подключения к Telegram';
-    }
-  }
+  document.getElementById('playBtn').onclick = () => showInfo('Запуск сессии... Подключитесь к рубежу!');
 </script>
-
 </body>
 </html>
