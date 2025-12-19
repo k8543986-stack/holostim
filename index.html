@@ -2,11 +2,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Holostim — 3D Профиль</title>
+  <title>Holostim — Профиль бойца</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
+  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -25,28 +25,95 @@
       background: rgba(0,0,0,0.5);
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .title { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-    #username { color: #ffcc33; font-size: 13px; font-weight: 600; }
+    .title {
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #username {
+      color: #ffcc33;
+      font-size: 13px;
+      font-weight: 600;
+    }
 
-    .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 15px; }
+    .top-tabs {
+      display: flex;
+      background: rgba(5,8,16,0.4);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .tab {
+      padding: 12px 20px;
+      color: #7f8aa1;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .tab.active {
+      color: #ffcc33;
+      border-bottom: 2px solid #ffcc33;
+    }
+
+    main { padding: 15px; }
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+    }
+
     .character-card {
       position: relative;
       background: rgba(10, 12, 20, 0.85);
       border-radius: 24px;
       border: 1px solid rgba(255,255,255,0.1);
       padding: 15px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
+
     .character-body {
       position: relative;
       border-radius: 20px;
       background: radial-gradient(circle at 50% 30%, #2a354d 0%, #0a0c14 100%);
-      height: 480px;
+      height: 320px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    model-viewer { width: 100%; height: 100%; }
+
+    #soldierImage {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 35px rgba(0,0,0,0.9));
+    }
+
+    .gender-switch {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 10;
+      display: flex;
+      background: rgba(0,0,0,0.7);
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .gender-btn {
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .gender-btn.active {
+      background: #ffcc33;
+      color: #000;
+      font-weight: bold;
+    }
 
     .btn-primary {
       width: 100%;
@@ -59,21 +126,49 @@
       font-size: 15px;
       font-weight: 900;
       text-transform: uppercase;
+      box-shadow: 0 8px 25px rgba(255, 149, 64, 0.3);
       cursor: pointer;
     }
 
-    /* Оверлей выбора пола */
+    .panel {
+      background: rgba(10, 12, 20, 0.6);
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 20px;
+    }
+    .panel-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #7f8aa1;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title::before {
+      content: "";
+      width: 3px;
+      height: 12px;
+      background: #ffcc33;
+      border-radius: 2px;
+    }
+
+    /* Оверлей выбора пола при первом заходе */
     #gender-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.9);
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 100;
     }
-    #gender-overlay h1 { margin-bottom: 20px; font-size: 22px; }
+    #gender-overlay h1 {
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
     .gender-choice {
       display: flex;
       gap: 20px;
@@ -86,23 +181,28 @@
       cursor: pointer;
       font-weight: 800;
     }
-    .male-btn  { background: #2a8cff; color: #fff; }
+    .male-btn   { background: #2a8cff; color: #fff; }
     .female-btn { background: #ff63c3; color: #fff; }
 
     @media (max-width: 780px) {
       .layout { grid-template-columns: 1fr; }
-      .character-body { height: 420px; }
+      .character-body { height: 260px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="title">HOLOSTIM 3D</div>
+  <div class="title">HOLOSTIM</div>
   <div id="username">@player</div>
 </header>
 
-<!-- Оверлей выбора пола -->
+<div class="top-tabs">
+  <div class="tab active">Склад</div>
+  <div class="tab">Данные</div>
+</div>
+
+<!-- Оверлей первого выбора пола -->
 <div id="gender-overlay">
   <h1>Кто вы в Holostim?</h1>
   <div class="gender-choice">
@@ -114,25 +214,32 @@
 <main>
   <div class="layout">
     <div class="character-card">
+      <div class="gender-switch">
+        <button class="gender-btn active" id="mBtn" onclick="switchGender('male')">♂</button>
+        <button class="gender-btn" id="fBtn" onclick="switchGender('female')">♀</button>
+      </div>
+
       <div class="character-body">
-        <model-viewer 
-          id="soldierModel"
-          src=""
-          auto-rotate
-          rotation-speed="0.5"
-          camera-controls
-          disable-zoom
-          shadow-intensity="1"
-          exposure="1"
-          environment-image="neutral">
-        </model-viewer>
+        <img id="soldierImage"
+             src="img/male_soldier.png"
+             alt="Holostim soldier">
       </div>
 
       <button class="btn-primary" onclick="battleReady()">В Бой</button>
     </div>
 
     <div class="right-column">
-      <!-- любая твоя статистика -->
+      <div class="panel">
+        <div class="panel-title">Сводка</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span style="color:#9aa3b5">Точность</span>
+          <span style="font-weight:bold">84%</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#9aa3b5">Ранг</span>
+          <span style="font-weight:bold; color:#ffcc33">Ветеран</span>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -149,33 +256,45 @@
     }
   }
 
-  const modelViewer = document.getElementById('soldierModel');
-  const overlay = document.getElementById('gender-overlay');
-
-  const MODEL_PATHS = {
-    male: 'models/male_soldier.glb',
-    female: 'models/female_soldier.glb'
+  const IMAGE_PATHS = {
+    male: 'img/male_soldier.png',
+    female: 'img/female_soldier.png'
   };
 
-  // при загрузке страницы — если пол уже известен, сразу подгружаем нужную модель
+  const soldierImage = document.getElementById('soldierImage');
+  const overlay = document.getElementById('gender-overlay');
+  const mBtn = document.getElementById('mBtn');
+  const fBtn = document.getElementById('fBtn');
+
+  // при загрузке: если пол сохранён, подставляем картинку; если нет — спрашиваем
   const savedGender = localStorage.getItem('holostim_gender');
-  if (savedGender && MODEL_PATHS[savedGender]) {
-    overlay.style.display = 'none';
-    modelViewer.src = MODEL_PATHS[savedGender];
+  if (savedGender && IMAGE_PATHS[savedGender]) {
+    setGender(savedGender, false);
+  } else {
+    overlay.style.display = 'flex';
+  }
+
+  function setGender(gender, withHaptics = true) {
+    if (!IMAGE_PATHS[gender]) return;
+
+    localStorage.setItem('holostim_gender', gender);
+    soldierImage.src = IMAGE_PATHS[gender];
+
+    mBtn.classList.toggle('active', gender === 'male');
+    fBtn.classList.toggle('active', gender === 'female');
+
+    if (withHaptics && tg && tg.HapticFeedback) {
+      tg.HapticFeedback.impactOccurred('medium');
+    }
   }
 
   function selectGender(gender) {
-    if (!MODEL_PATHS[gender]) return;
-
-    localStorage.setItem('holostim_gender', gender);
     overlay.style.display = 'none';
+    setGender(gender, true);
+  }
 
-    // лёгкий хаптик
-    if (tg && tg.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('medium');
-    }
-
-    modelViewer.src = MODEL_PATHS[gender];
+  function switchGender(gender) {
+    setGender(gender, true);
   }
 
   function battleReady() {
