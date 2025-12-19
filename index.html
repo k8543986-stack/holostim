@@ -36,7 +36,6 @@
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #fff;
     }
     header .balance {
       font-size: 13px;
@@ -59,7 +58,6 @@
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       cursor: pointer;
     }
     .tab.active {
@@ -109,7 +107,7 @@
       backdrop-filter: blur(10px);
     }
     .gender-btn {
-      padding: 6px 10px;
+      padding: 6px 12px;
       border: none;
       background: transparent;
       color: #fff;
@@ -191,7 +189,7 @@
     @media (max-width: 780px) {
       .layout { grid-template-columns: 1fr; }
       header { padding: 10px 15px; }
-      .character-body { height: 420px; }
+      .character-body { height: 440px; }
     }
   </style>
 </head>
@@ -201,7 +199,7 @@
   <div>
     <div class="title">HOLOSTIM 3D</div>
   </div>
-  <div class="balance" id="username">@загрузка</div>
+  <div class="balance" id="username">@loading</div>
 </header>
 
 <div class="top-tabs">
@@ -213,14 +211,12 @@
 <main>
   <div class="layout">
     <div class="character-card">
-      <!-- Переключатель пола -->
       <div class="gender-switch">
         <button class="gender-btn active" id="mBtn" onclick="setGender('male')">♂</button>
         <button class="gender-btn" id="fBtn" onclick="setGender('female')">♀</button>
       </div>
 
       <div class="character-body">
-        <!-- 3D МОДЕЛЬ -->
         <model-viewer 
           id="soldierModel"
           src="https://threejs.org/examples/models/gltf/Soldier.glb" 
@@ -235,24 +231,24 @@
       </div>
 
       <div class="character-footer">
-        <button class="btn-primary" onclick="tg.HapticFeedback.notificationOccurred('success'); tg.showAlert('Подготовка полигона...');">На рубеж</button>
+        <button class="btn-primary" onclick="tg.HapticFeedback.notificationOccurred('success'); tg.showAlert('Готовность №1!');">В Бой</button>
       </div>
     </div>
 
     <div class="right-column">
       <div class="panel">
-        <div class="panel-title">Боевые показатели</div>
+        <div class="panel-title">Боевая сводка</div>
         <div class="stats-item">
           <span class="stats-label">Точность</span>
           <span class="stats-value">84%</span>
         </div>
         <div class="stats-item">
-          <span class="stats-label">Сессии</span>
-          <span class="stats-value">124</span>
+          <span class="stats-label">Уровень</span>
+          <span class="stats-value">5</span>
         </div>
         <div class="stats-item">
-          <span class="stats-label">Ранг</span>
-          <span class="stats-value" style="color:#ffcc33">Ветеран</span>
+          <span class="stats-label">Класс</span>
+          <span class="stats-value" style="color:#ffcc33">Разведчик</span>
         </div>
       </div>
     </div>
@@ -264,13 +260,11 @@
   tg.ready();
   tg.expand();
 
-  // Данные пользователя
   const user = tg.initDataUnsafe?.user;
   if (user) {
     document.getElementById('username').textContent = `@${user.username || user.first_name}`;
   }
 
-  // Логика смены пола
   const modelViewer = document.getElementById('soldierModel');
   const mBtn = document.getElementById('mBtn');
   const fBtn = document.getElementById('fBtn');
@@ -279,12 +273,13 @@
     tg.HapticFeedback.impactOccurred('medium');
     
     if (gender === 'male') {
+      // Мужская модель
       modelViewer.src = "https://threejs.org/examples/models/gltf/Soldier.glb";
       mBtn.classList.add('active');
       fBtn.classList.remove('active');
     } else {
-      // Подгружаем женскую модель из официальных примеров Khronos
-      modelViewer.src = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CesiumMan/glTF-Binary/CesiumMan.glb";
+      // Новая модель девушки-солдата
+      modelViewer.src = "https://models.readyplayer.me/651f98d780961b695c026e63.glb"; 
       fBtn.classList.add('active');
       mBtn.classList.remove('active');
     }
