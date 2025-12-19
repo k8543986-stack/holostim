@@ -5,10 +5,7 @@
   <title>Holostim — 3D Профиль</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
-  <!-- model-viewer -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
   <style>
@@ -18,7 +15,6 @@
       font-family: system-ui, -apple-system, sans-serif;
       background: radial-gradient(circle at top, #1c2738 0, #050810 55%, #020308 100%);
       color: #fff;
-      overflow: hidden;
     }
 
     header {
@@ -27,55 +23,19 @@
       justify-content: space-between;
       padding: 10px 20px;
       background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .title {
-      font-size: 16px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    #username {
-      color: #ffcc33;
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .title { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    #username { color: #ffcc33; font-size: 13px; font-weight: 600; }
 
-    .top-tabs {
-      display: flex;
-      background: rgba(5,8,16,0.4);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .tab {
-      padding: 12px 20px;
-      color: #7f8aa1;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-    .tab.active {
-      color: #ffcc33;
-      border-bottom: 2px solid #ffcc33;
-    }
-
-    main { padding: 15px; }
-    .layout {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 20px;
-    }
-
+    .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 15px; }
     .character-card {
       position: relative;
       background: rgba(10, 12, 20, 0.85);
       border-radius: 24px;
       border: 1px solid rgba(255,255,255,0.1);
       padding: 15px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
-    
     .character-body {
       position: relative;
       border-radius: 20px;
@@ -86,51 +46,7 @@
       align-items: center;
       justify-content: center;
     }
-
-    .gender-switch {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      z-index: 100;
-      display: flex;
-      background: rgba(0,0,0,0.7);
-      border-radius: 12px;
-      padding: 4px;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-    .gender-btn {
-      padding: 8px 12px;
-      border: none;
-      background: transparent;
-      color: #fff;
-      font-size: 14px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .gender-btn.active {
-      background: #ffcc33;
-      color: #000;
-      font-weight: bold;
-    }
-
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      outline: none;
-    }
-
-    #lazy-load-poster {
-      position: absolute;
-      left: 0; right: 0; top: 0; bottom: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: rgba(10,12,20,0.5);
-      color: #ffcc33;
-      font-weight: bold;
-      font-size: 14px;
-      z-index: 5;
-    }
+    model-viewer { width: 100%; height: 100%; }
 
     .btn-primary {
       width: 100%;
@@ -143,33 +59,35 @@
       font-size: 15px;
       font-weight: 900;
       text-transform: uppercase;
-      box-shadow: 0 8px 25px rgba(255, 149, 64, 0.3);
       cursor: pointer;
     }
 
-    .panel {
-      background: rgba(10, 12, 20, 0.6);
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 20px;
-    }
-    .panel-title {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: #7f8aa1;
-      margin-bottom: 15px;
+    /* Оверлей выбора пола */
+    #gender-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      z-index: 100;
     }
-    .panel-title::before {
-      content: "";
-      width: 3px;
-      height: 12px;
-      background: #ffcc33;
-      border-radius: 2px;
+    #gender-overlay h1 { margin-bottom: 20px; font-size: 22px; }
+    .gender-choice {
+      display: flex;
+      gap: 20px;
     }
+    .gender-choice button {
+      padding: 16px 24px;
+      font-size: 16px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .male-btn  { background: #2a8cff; color: #fff; }
+    .female-btn { background: #ff63c3; color: #fff; }
 
     @media (max-width: 780px) {
       .layout { grid-template-columns: 1fr; }
@@ -184,24 +102,22 @@
   <div id="username">@player</div>
 </header>
 
-<div class="top-tabs">
-  <div class="tab active">Склад</div>
-  <div class="tab">Данные</div>
+<!-- Оверлей выбора пола -->
+<div id="gender-overlay">
+  <h1>Кто вы в Holostim?</h1>
+  <div class="gender-choice">
+    <button class="male-btn" onclick="selectGender('male')">Боец</button>
+    <button class="female-btn" onclick="selectGender('female')">Бойчиха</button>
+  </div>
 </div>
 
 <main>
   <div class="layout">
     <div class="character-card">
-      <div class="gender-switch">
-        <button class="gender-btn active" id="mBtn" onclick="setGender('male')">♂</button>
-        <button class="gender-btn" id="fBtn" onclick="setGender('female')">♀</button>
-      </div>
-
       <div class="character-body">
-        <div id="lazy-load-poster" style="display:none;">ЗАГРУЗКА 3D...</div>
         <model-viewer 
           id="soldierModel"
-          src="models/male_soldier.glb"
+          src=""
           auto-rotate
           rotation-speed="0.5"
           camera-controls
@@ -216,17 +132,7 @@
     </div>
 
     <div class="right-column">
-      <div class="panel">
-        <div class="panel-title">Сводка</div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-          <span style="color:#9aa3b5">Точность</span>
-          <span style="font-weight:bold">84%</span>
-        </div>
-        <div style="display:flex; justify-content:space-between;">
-          <span style="color:#9aa3b5">Ранг</span>
-          <span style="font-weight:bold; color:#ffcc33">Ветеран</span>
-        </div>
-      </div>
+      <!-- любая твоя статистика -->
     </div>
   </div>
 </main>
@@ -244,28 +150,32 @@
   }
 
   const modelViewer = document.getElementById('soldierModel');
-  const poster = document.getElementById('lazy-load-poster');
+  const overlay = document.getElementById('gender-overlay');
 
-  modelViewer.addEventListener('load', () => {
-    poster.style.display = 'none';
-  });
+  const MODEL_PATHS = {
+    male: 'models/male_soldier.glb',
+    female: 'models/female_soldier.glb'
+  };
 
-  function setGender(gender) {
+  // при загрузке страницы — если пол уже известен, сразу подгружаем нужную модель
+  const savedGender = localStorage.getItem('holostim_gender');
+  if (savedGender && MODEL_PATHS[savedGender]) {
+    overlay.style.display = 'none';
+    modelViewer.src = MODEL_PATHS[savedGender];
+  }
+
+  function selectGender(gender) {
+    if (!MODEL_PATHS[gender]) return;
+
+    localStorage.setItem('holostim_gender', gender);
+    overlay.style.display = 'none';
+
+    // лёгкий хаптик
     if (tg && tg.HapticFeedback) {
       tg.HapticFeedback.impactOccurred('medium');
     }
 
-    poster.style.display = 'flex';
-
-    if (gender === 'male') {
-      modelViewer.src = 'models/male_soldier.glb';
-      document.getElementById('mBtn').classList.add('active');
-      document.getElementById('fBtn').classList.remove('active');
-    } else {
-      modelViewer.src = 'models/female_soldier.glb';
-      document.getElementById('fBtn').classList.add('active');
-      document.getElementById('mBtn').classList.remove('active');
-    }
+    modelViewer.src = MODEL_PATHS[gender];
   }
 
   function battleReady() {
