@@ -8,14 +8,14 @@
   <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
-  <!-- Библиотека для отображения 3D-моделей от Google -->
+  <!-- Библиотека для отображения 3D-моделей -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       background: radial-gradient(circle at top, #1c2738 0, #050810 55%, #020308 100%);
       color: #fff;
       overflow: hidden;
@@ -27,61 +27,29 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
       background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    header .title {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    header .balance {
-      font-size: 13px;
-      color: #ffcc33;
-      font-weight: 600;
-    }
+    .title { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    #username { color: #ffcc33; font-size: 13px; font-weight: 600; }
 
     /* Вкладки */
-    .top-tabs {
-      display: flex;
-      padding: 5px 20px 0;
-      background: rgba(5,8,16,0.4);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .tab {
-      padding: 10px 15px;
-      border: none;
-      background: transparent;
-      color: #7f8aa1;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-    .tab.active {
-      color: #ffcc33;
-      border-bottom: 2px solid #ffcc33;
-    }
+    .top-tabs { display: flex; background: rgba(5,8,16,0.4); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .tab { padding: 12px 20px; color: #7f8aa1; font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+    .tab.active { color: #ffcc33; border-bottom: 2px solid #ffcc33; }
 
-    main { padding: 15px 20px; }
-
-    /* Лейаут */
-    .layout {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 20px;
-    }
+    main { padding: 15px; }
+    .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
 
     /* Карточка персонажа */
     .character-card {
       position: relative;
-      background: rgba(10, 12, 20, 0.8);
+      background: rgba(10, 12, 20, 0.85);
       border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
       padding: 15px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
     
     .character-body {
@@ -90,7 +58,9 @@
       background: radial-gradient(circle at 50% 30%, #2a354d 0%, #0a0c14 100%);
       height: 480px;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* Переключатель пола */
@@ -100,112 +70,62 @@
       right: 15px;
       z-index: 100;
       display: flex;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       border-radius: 12px;
       padding: 4px;
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
     }
     .gender-btn {
-      padding: 6px 12px;
+      padding: 8px 12px;
       border: none;
       background: transparent;
       color: #fff;
       font-size: 14px;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.2s;
     }
-    .gender-btn.active {
-      background: #ffcc33;
-      color: #000;
-      box-shadow: 0 0 10px rgba(255,204,51,0.4);
-    }
+    .gender-btn.active { background: #ffcc33; color: #000; font-weight: bold; }
 
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      outline: none;
-    }
+    model-viewer { width: 100%; height: 100%; outline: none; }
 
-    .character-footer {
-      margin-top: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    /* Индикатор загрузки */
+    #lazy-load-poster {
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      display: flex; justify-content: center; align-items: center;
+      background: rgba(10,12,20,0.5);
+      color: #ffcc33; font-weight: bold; font-size: 14px;
+      z-index: 5;
     }
 
     .btn-primary {
-      width: 100%;
-      padding: 16px;
-      border-radius: 15px;
-      border: none;
+      width: 100%; padding: 18px; margin-top: 15px; border-radius: 16px; border: none;
       background: linear-gradient(135deg, #ffcc33 0%, #ff9540 100%);
-      color: #000;
-      font-size: 14px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      box-shadow: 0 5px 20px rgba(255, 149, 64, 0.4);
+      color: #000; font-size: 15px; font-weight: 900; text-transform: uppercase;
+      box-shadow: 0 8px 25px rgba(255, 149, 64, 0.3);
     }
 
     /* Правая колонка */
-    .right-column { display: flex; flex-direction: column; gap: 15px; }
-    .panel {
-      background: rgba(10, 12, 20, 0.6);
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 20px;
-    }
-    .panel-title {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: #7f8aa1;
-      letter-spacing: 0.15em;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .panel-title::before {
-      content: "";
-      width: 3px;
-      height: 12px;
-      background: #ffcc33;
-      border-radius: 2px;
-    }
-
-    .stats-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 13px;
-    }
-    .stats-label { color: #9aa3b5; }
-    .stats-value { font-weight: 700; color: #fff; }
+    .panel { background: rgba(10, 12, 20, 0.6); border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); padding: 20px; }
+    .panel-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #7f8aa1; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .panel-title::before { content: ""; width: 3px; height: 12px; background: #ffcc33; border-radius: 2px; }
 
     @media (max-width: 780px) {
       .layout { grid-template-columns: 1fr; }
-      header { padding: 10px 15px; }
-      .character-body { height: 440px; }
+      .character-body { height: 420px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div>
-    <div class="title">HOLOSTIM 3D</div>
-  </div>
-  <div class="balance" id="username">@loading</div>
+  <div class="title">HOLOSTIM 3D</div>
+  <div id="username">@player</div>
 </header>
 
 <div class="top-tabs">
   <div class="tab active">Склад</div>
   <div class="tab">Данные</div>
-  <div class="tab">Маркет</div>
 </div>
 
 <main>
@@ -217,38 +137,28 @@
       </div>
 
       <div class="character-body">
+        <div id="lazy-load-poster" style="display:none;">ЗАГРУЗКА 3D...</div>
         <model-viewer 
           id="soldierModel"
           src="https://threejs.org/examples/models/gltf/Soldier.glb" 
-          auto-rotate 
-          rotation-speed="0.5"
-          camera-controls
-          disable-zoom
-          shadow-intensity="1"
-          exposure="1"
-          environment-image="neutral">
+          auto-rotate rotation-speed="0.5" camera-controls disable-zoom
+          shadow-intensity="1" exposure="1" environment-image="neutral">
         </model-viewer>
       </div>
 
-      <div class="character-footer">
-        <button class="btn-primary" onclick="tg.HapticFeedback.notificationOccurred('success'); tg.showAlert('Готовность №1!');">В Бой</button>
-      </div>
+      <button class="btn-primary" onclick="tg.showAlert('Боевая готовность!')">В Бой</button>
     </div>
 
     <div class="right-column">
       <div class="panel">
-        <div class="panel-title">Боевая сводка</div>
-        <div class="stats-item">
-          <span class="stats-label">Точность</span>
-          <span class="stats-value">84%</span>
+        <div class="panel-title">Сводка</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span style="color:#9aa3b5">Точность</span>
+          <span style="font-weight:bold">84%</span>
         </div>
-        <div class="stats-item">
-          <span class="stats-label">Уровень</span>
-          <span class="stats-value">5</span>
-        </div>
-        <div class="stats-item">
-          <span class="stats-label">Класс</span>
-          <span class="stats-value" style="color:#ffcc33">Разведчик</span>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#9aa3b5">Ранг</span>
+          <span style="font-weight:bold; color:#ffcc33">Ветеран</span>
         </div>
       </div>
     </div>
@@ -258,30 +168,30 @@
 <script>
   const tg = window.Telegram.WebApp;
   tg.ready();
-  tg.expand();
-
-  const user = tg.initDataUnsafe?.user;
-  if (user) {
-    document.getElementById('username').textContent = `@${user.username || user.first_name}`;
+  
+  if (tg.initDataUnsafe?.user) {
+    document.getElementById('username').textContent = `@${tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name}`;
   }
 
   const modelViewer = document.getElementById('soldierModel');
-  const mBtn = document.getElementById('mBtn');
-  const fBtn = document.getElementById('fBtn');
+  const poster = document.getElementById('lazy-load-poster');
+
+  // Показываем надпись при смене модели
+  modelViewer.addEventListener('load', () => { poster.style.display = 'none'; });
 
   function setGender(gender) {
     tg.HapticFeedback.impactOccurred('medium');
+    poster.style.display = 'flex';
     
     if (gender === 'male') {
-      // Мужская модель
       modelViewer.src = "https://threejs.org/examples/models/gltf/Soldier.glb";
-      mBtn.classList.add('active');
-      fBtn.classList.remove('active');
+      document.getElementById('mBtn').classList.add('active');
+      document.getElementById('fBtn').classList.remove('active');
     } else {
-      // Новая модель девушки-солдата
+      // Прямая ссылка на качественную модель девушки-солдата
       modelViewer.src = "https://models.readyplayer.me/651f98d780961b695c026e63.glb"; 
-      fBtn.classList.add('active');
-      mBtn.classList.remove('active');
+      document.getElementById('fBtn').classList.add('active');
+      document.getElementById('mBtn').classList.remove('active');
     }
   }
 </script>
