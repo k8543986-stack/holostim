@@ -2,11 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Holostim — Дашборд</title>
+  <title>Holostim — 3D Дашборд</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Библиотека для отображения 3D-моделей от Google -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -35,17 +38,13 @@
       text-transform: uppercase;
       color: #f3f4f7;
     }
-    header .subtitle {
-      font-size: 12px;
-      color: #9aa3b5;
-    }
     header .balance {
       font-size: 13px;
       color: #d0e9ff;
       text-align: right;
     }
 
-    /* Вкладки сверху */
+    /* Вкладки */
     .top-tabs {
       display: flex;
       gap: 8px;
@@ -63,11 +62,8 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: color 0.2s;
     }
-    .top-tabs .tab.active {
-      color: #ffcc33;
-    }
+    .top-tabs .tab.active { color: #ffcc33; }
     .top-tabs .tab.active::after {
       content: "";
       position: absolute;
@@ -76,28 +72,21 @@
       bottom: 0;
       height: 3px;
       background: linear-gradient(90deg, #ffcc33, #ff7a2f);
-      box-shadow: 0 -2px 10px rgba(255, 204, 51, 0.4);
     }
 
-    main {
-      padding: 16px 20px;
-    }
+    main { padding: 16px 20px; }
 
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    /* Лейаут вкладки "СКЛАД" */
+    /* Лейаут */
     .layout {
       display: grid;
       grid-template-columns: 340px 1fr;
       gap: 20px;
     }
 
-    /* Левая колонка — персонаж */
+    /* Карточка персонажа с 3D */
     .character-card {
       background: rgba(10, 12, 20, 0.8);
       border-radius: 20px;
@@ -106,121 +95,42 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .character-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .character-class {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #9aa3b5;
-    }
-    .character-level {
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffcc33;
     }
     .character-body {
       position: relative;
       border-radius: 16px;
-      background: radial-gradient(circle at 50% 30%, #2a354d 0%, #0a0c14 100%);
-      height: 420px;
+      background: radial-gradient(circle at 50% 40%, #2a354d 0%, #0a0c14 100%);
+      height: 450px;
       overflow: hidden;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
       border: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* Арт персонажа */
-    .soldier-art {
+    /* Компонент 3D Модели */
+    model-viewer {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: 22% center; /* Смещаем, чтобы показать мужского персонажа */
-      filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-      opacity: 0.9;
-    }
-    
-    /* Затемнение внизу персонажа для читаемости */
-    .character-body::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 40%;
-      background: linear-gradient(to top, #0a0c14 0%, transparent 100%);
+      --poster-color: transparent;
+      outline: none;
     }
 
     .avatar-wrapper {
       position: absolute;
       top: 16px;
       left: 16px;
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      border: 3px solid #ffcc33;
-      box-shadow: 0 0 15px rgba(255, 204, 51, 0.4);
+      border: 2px solid #ffcc33;
       overflow: hidden;
+      z-index: 10;
       background: #111520;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
     }
-    .avatar-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .upload-avatar-btn {
-      position: absolute;
-      top: 104px;
-      left: 16px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      padding: 5px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(0,0,0,0.7);
-      cursor: pointer;
-      z-index: 10;
-      backdrop-filter: blur(4px);
-    }
-    .upload-avatar-btn input { display: none; }
+    .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
-    .character-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .xp-bar-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #9aa3b5;
-      display: flex;
-      justify-content: space-between;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .xp-bar {
-      height: 8px;
-      border-radius: 10px;
-      background: #151824;
-      overflow: hidden;
-    }
-    .xp-bar-fill {
-      height: 100%;
-      width: 45%;
-      background: linear-gradient(90deg, #ffcc33, #ff7a2f);
-      box-shadow: 0 0 10px rgba(255, 122, 47, 0.5);
-    }
+    .character-footer { display: flex; flex-direction: column; gap: 12px; }
+    .xp-bar { height: 6px; border-radius: 10px; background: #151824; overflow: hidden; }
+    .xp-bar-fill { height: 100%; width: 45%; background: #ffcc33; }
+
     .btn-primary {
       width: 100%;
       padding: 16px;
@@ -231,84 +141,22 @@
       font-size: 15px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(255, 149, 64, 0.4);
-      transition: transform 0.1s;
-    }
-    .btn-primary:active { transform: scale(0.98); }
-
-    /* Правая колонка */
-    .right-column {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .panel {
-      background: rgba(10, 12, 20, 0.6);
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 18px;
-    }
-    .panel-title {
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #7f8aa1;
-      margin-bottom: 14px;
-      border-left: 3px solid #ffcc33;
-      padding-left: 10px;
     }
 
-    .modes-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
-    .mode-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 14px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .mode-card:hover {
-      background: rgba(255,255,255,0.06);
-      border-color: #ffcc33;
-      transform: translateY(-2px);
-    }
-    .mode-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #fff; }
-    .mode-desc { font-size: 11px; color: #9aa3b5; line-height: 1.5; }
-
-    .achievements-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .ach-badge {
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      font-size: 12px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .ach-badge:hover { background: rgba(255,255,255,0.08); border-color: #ffcc33; }
-    .ach-badge.gold { border-color: rgba(255, 204, 51, 0.5); color: #ffcc33; }
+    /* Контент справа */
+    .right-column { display: flex; flex-direction: column; gap: 20px; }
+    .panel { background: rgba(10, 12, 20, 0.6); border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); padding: 18px; }
+    .panel-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #7f8aa1; margin-bottom: 14px; }
+    
+    .modes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .mode-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; cursor: pointer; }
+    .mode-card:hover { border-color: #ffcc33; }
 
     @media (max-width: 780px) {
       .layout { grid-template-columns: 1fr; }
-      .character-body { height: 380px; }
-      .modes-grid { grid-template-columns: 1fr; }
-      header { flex-direction: column; align-items: flex-start; gap: 4px; }
-      header .balance { text-align: left; }
+      .character-body { height: 400px; }
+      header { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -316,95 +164,53 @@
 
 <header>
   <div>
-    <div class="title">HOLOSTIM</div>
-    <div class="subtitle">Профиль стрелка · Личный склад</div>
+    <div class="title">HOLOSTIM 3D</div>
+    <div class="subtitle">Интерактивный полигон</div>
   </div>
-  <div class="balance" id="tg-balance">
-    Загрузка профиля...
-  </div>
+  <div class="balance" id="tg-balance">Загрузка...</div>
 </header>
 
 <nav class="top-tabs">
   <button class="tab active" data-tab="sklad">Склад</button>
   <button class="tab" data-tab="progress">Прогресс</button>
-  <button class="tab" data-tab="shop">Магазин</button>
 </nav>
 
 <main>
   <section class="tab-content active" id="tab-sklad">
     <div class="layout">
-      <!-- Блок персонажа -->
       <div class="character-card">
-        <div class="character-header">
-          <span class="character-class">Штурмовик / Полигон</span>
-          <span class="character-level" id="char-lvl">LVL 5 · Боец</span>
-        </div>
-
         <div class="character-body">
-          <div class="avatar-wrapper" id="avatar">
-            <span style="color: #4a5568; font-size: 11px; font-weight: 800;">FACE ID</span>
-          </div>
-          <label class="upload-avatar-btn">
-            <input type="file" accept="image/*" id="avatarInput">
-            Сменить фото
-          </label>
-
-          <!-- Арт персонажа с ArtStation -->
-          <img class="soldier-art" src="https://cdna.artstation.com/p/assets/images/images/064/963/400/large/sunstrike-studios-warface-portfolio-pack-04-artstation-01-1.jpg?1689173514" alt="Soldier">
+          <div class="avatar-wrapper" id="avatar"></div>
+          
+          <!-- 3D МОДЕЛЬ СОЛДАТА -->
+          <model-viewer 
+            src="https://threejs.org/examples/models/gltf/Soldier.glb" 
+            alt="3D Солдат Holostim"
+            auto-rotate 
+            rotation-speed="0.5"
+            camera-controls
+            disable-zoom
+            shadow-intensity="1"
+            exposure="1"
+            environment-image="neutral">
+          </model-viewer>
         </div>
 
         <div class="character-footer">
-          <div class="xp-bar-label">
-            <span>Опыт до уровня 6</span>
-            <span>1280 / 3000 XP</span>
-          </div>
-          <div class="xp-bar">
-            <div class="xp-bar-fill"></div>
-          </div>
-          <button class="btn-primary" id="playBtn">На рубеж · Огонь!</button>
+          <div class="xp-bar"><div class="xp-bar-fill"></div></div>
+          <button class="btn-primary" onclick="tg.showAlert('Запуск 3D-сессии...')">В Бой</button>
         </div>
       </div>
 
-      <!-- Контентная часть -->
       <div class="right-column">
         <div class="panel">
-          <div class="panel-title">Доступные режимы</div>
+          <div class="panel-title">Режимы</div>
           <div class="modes-grid">
-            <div class="mode-card" onclick="showInfo('Стандарт: 30 мишеней, время не ограничено. Идеально для разминки.')">
-              <div class="mode-title">Мишени</div>
-              <div class="mode-desc">Классическая стрельба по статичным целям.</div>
-            </div>
-            <div class="mode-card" onclick="showInfo('Реакция: мишени появляются на 0.7 сек. Успей поразить всех!')">
-              <div class="mode-title">Блиц</div>
-              <div class="mode-desc">Динамическая тренировка скорости реакции.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">Медали и почести</div>
-          <div class="achievements-list">
-            <div class="ach-badge gold" onclick="showInfo('Выдано за первый вход в систему Holostim.')">⭐ Первенец</div>
-            <div class="ach-badge" onclick="showInfo('Поразите 10 целей в голову подряд.')">🎯 Глаз алмаз</div>
-            <div class="ach-badge" onclick="showInfo('Сыграйте сессию в ночном режиме.')">🌙 Ночной охотник</div>
+            <div class="mode-card"><b>Снайпер</b><br><small>30 мишеней</small></div>
+            <div class="mode-card"><b>Блиц</b><br><small>Реакция</small></div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Заглушки для других вкладок -->
-  <section class="tab-content" id="tab-progress">
-    <div style="padding: 40px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px; text-align: center;">
-      <h3 style="color: #ffcc33;">Архив данных</h3>
-      <p style="color: #7f8aa1;">Здесь будет храниться история твоих выстрелов и прогресс точности.</p>
-    </div>
-  </section>
-
-  <section class="tab-content" id="tab-shop">
-    <div style="padding: 40px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px; text-align: center;">
-      <h3 style="color: #ffcc33;">Арсенал</h3>
-      <p style="color: #7f8aa1;">Магазин подписок и дополнительных режимов в разработке.</p>
     </div>
   </section>
 </main>
@@ -412,48 +218,10 @@
 <script>
   const tg = window.Telegram.WebApp;
   tg.ready();
-  tg.expand();
-
-  // Автоподстановка данных пользователя
   const user = tg.initDataUnsafe?.user;
   if (user) {
-    document.getElementById('tg-balance').textContent = `@${user.username || user.first_name} · id ${user.id}`;
-    document.getElementById('char-lvl').textContent = `LVL 5 · ${user.first_name}`;
+    document.getElementById('tg-balance').textContent = `@${user.username || user.first_name}`;
   }
-
-  function showInfo(text) {
-    tg.showAlert(text);
-  }
-
-  // Логика переключения вкладок
-  document.querySelectorAll('.tab').forEach(button => {
-    button.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      button.classList.add('active');
-      document.getElementById('tab-' + button.dataset.tab).classList.add('active');
-      tg.HapticFeedback.impactOccurred('light');
-    });
-  });
-
-  // Загрузка аватарки
-  const avatarInput = document.getElementById('avatarInput');
-  const avatar = document.getElementById('avatar');
-  avatarInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        avatar.innerHTML = `<img src="${event.target.result}">`;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  document.getElementById('playBtn').onclick = () => {
-    tg.HapticFeedback.notificationOccurred('success');
-    showInfo('Боевая готовность! Подключайтесь к рубежу через терминал.');
-  };
 </script>
 </body>
 </html>
