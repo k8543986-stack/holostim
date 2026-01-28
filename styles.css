@@ -1,0 +1,67 @@
+.screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.onboarding-card {
+  background: rgba(10, 12, 20, 0.95);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.onboarding-step {
+  display: none;
+}
+
+.onboarding-step.active {
+  display: block;
+}
+
+.gender-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.gender-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 999px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gender-buttons button:first-child {
+  background: #2a8cff;
+  color: #fff;
+}
+
+.gender-buttons button:last-child {
+  background: #ff63c3;
+  color: #fff;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 16px 0;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+}
+
+.consent {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  margin: 16px 0;
+}

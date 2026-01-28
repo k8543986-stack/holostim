@@ -16,34 +16,45 @@
 <!-- ================= ЭКРАН ОНБОРДИНГА ================= -->
 <div id="screen-onboarding" class="screen">
   <div class="onboarding-card">
-    <h1>Добро пожаловать в Holostim</h1>
-    <p>Создай своего виртуального стрелка</p>
 
-    <div class="onboarding-step">
-      <h3>Выбери пол</h3>
+    <!-- Шаг 1: Пол -->
+    <div class="onboarding-step active" id="step-gender">
+      <h1>Добро пожаловать в Holostim</h1>
+      <p>Выбери пол своего бойца</p>
+
       <div class="gender-buttons">
-        <button onclick="selectGender('male')">Мужской</button>
-        <button onclick="selectGender('female')">Женский</button>
+        <button onclick="chooseGender('male')">Мужской</button>
+        <button onclick="chooseGender('female')">Женский</button>
       </div>
     </div>
 
-    <div class="onboarding-step">
-      <h3>Псевдоним</h3>
+    <!-- Шаг 2: Ник -->
+    <div class="onboarding-step" id="step-nickname">
+      <h1>Как тебя называть?</h1>
+      <p>Этот ник будут видеть в системе</p>
+
       <input type="text" id="nicknameInput" placeholder="Введите ник">
+      <button class="btn-primary" onclick="saveNickname()">Далее</button>
     </div>
 
-    <div class="onboarding-step">
+    <!-- Шаг 3: Согласие -->
+    <div class="onboarding-step" id="step-consent">
+      <h1>Почти готово</h1>
+      <p>Подтверди согласие на обработку данных</p>
+
       <label class="consent">
         <input type="checkbox" id="consentCheckbox">
         Я согласен на обработку персональных данных
       </label>
+
+      <button class="btn-primary" id="finishBtn" disabled onclick="finishRegistration()">
+        Создать аккаунт
+      </button>
     </div>
 
-    <button class="btn-primary" onclick="finishRegistration()">
-      Создать аккаунт
-    </button>
   </div>
 </div>
+
 
 <!-- ================= ГЛАВНЫЙ ЭКРАН ================= -->
 <div id="screen-main" class="screen" style="display:none">
