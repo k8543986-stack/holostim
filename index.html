@@ -81,6 +81,7 @@
   <button class="tab" data-tab="shop">Магазин</button>
 </nav>
 
+
 <main>
   <!-- Вкладка СКЛАД -->
   <section class="tab-content active" id="tab-sklad">
@@ -154,7 +155,25 @@
       Магазин и подписки
     </div>
   </section>
+  <!-- DEV кнопка (видна только в разработке) -->
+<button
+  id="dev-reset-btn"
+  onclick="resetAccount()"
+  style="
+    display:none;
+    margin: 24px auto 0;
+    padding: 8px 14px;
+    font-size: 12px;
+    opacity: 0.6;
+    border-radius: 999px;
+    border: 1px dashed rgba(255,255,255,0.4);
+    background: transparent;
+    color: #fff;
+  ">
+  🔄 Сбросить аккаунт (DEV)
+</button>
 </main>
+
 
 </div>
 

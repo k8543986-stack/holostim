@@ -1,8 +1,19 @@
 // app.js
 
+/* =======================
+   CONFIG
+======================= */
+
+const DEV_MODE = true; // ⬅️ В PROD просто поставишь false
+
+/* =======================
+   APP INIT
+======================= */
+
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
   initOnboarding();
+  initDevTools();
 });
 
 function initApp() {
@@ -20,7 +31,7 @@ function initApp() {
 }
 
 /* =======================
-   ONBOARDING LOGIC
+   ONBOARDING
 ======================= */
 
 let onboardingStep = 1;
@@ -37,8 +48,8 @@ function initOnboarding() {
 }
 
 function showStep(step) {
-  document.querySelectorAll('.onboarding-step').forEach(stepEl => {
-    stepEl.classList.remove('active');
+  document.querySelectorAll('.onboarding-step').forEach(el => {
+    el.classList.remove('active');
   });
 
   const stepsMap = {
@@ -70,7 +81,7 @@ function saveNickname() {
 }
 
 function finishRegistration() {
-  player.id = Date.now(); // временный id
+  player.id = Date.now(); // временно
   player.level = 1;
   player.league = 'Новичок';
   player.xp = 0;
@@ -80,4 +91,22 @@ function finishRegistration() {
 
   appState = AppState.READY;
   showScreen('screen-main');
+}
+
+/* =======================
+   DEV TOOLS
+======================= */
+
+function resetAccount() {
+  localStorage.removeItem('holostim_player');
+  location.reload();
+}
+
+function initDevTools() {
+  if (!DEV_MODE) return;
+
+  const devBtn = document.getElementById('dev-reset-btn');
+  if (devBtn) {
+    devBtn.style.display = 'block';
+  }
 }
