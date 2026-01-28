@@ -23,7 +23,7 @@
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  padding: 16px 12px;
+  padding: 12px;
   overflow-y: auto;
 }
 
@@ -100,11 +100,12 @@
 .wick-gender-screen {
   position: relative;
   width: 100%;
-  height: min(420px, 60vh);
+  height: min(360px, 55vh);
   border-radius: 18px;
   overflow: hidden;
   background: #000;
 }
+
 
 .wick-bg {
   position: absolute;
@@ -147,15 +148,19 @@
 .wick-female { right: 0; }
 
 .wick-label {
-  font-size: 12px;
-  letter-spacing: 0.35em;
+  position: absolute;
+  top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
   font-weight: 600;
   text-transform: uppercase;
-  background: rgba(0,0,0,0.35);
+  z-index: 3;
   padding: 6px 10px;
   border-radius: 999px;
+  background: rgba(0,0,0,0.45);
   backdrop-filter: blur(4px);
 }
+
 
 .wick-label-male {
   left: 20px;
