@@ -24,22 +24,46 @@
       <span class="step-dot" data-step="3"></span>
     </div>
 
-    <!-- Шаг 1: Пол -->
-    <div class="onboarding-step" id="step-gender">
-      <div class="gender-image-wrapper">
-        <img src="assets/img/gender_select.jpg" alt="Выбор персонажа">
-      </div>
+    <!-- Шаг 1: Выбор персонажа -->
+<div class="onboarding-step" id="step-gender">
 
-      <div class="gender-overlay">
-        <h1>Кто ты в Holostim?</h1>
-        <p>Выбери своего бойца</p>
+  <div class="wick-gender-screen">
 
-        <div class="gender-buttons">
-          <button class="male-btn" onclick="chooseGender('male')">Мужской</button>
-          <button class="female-btn" onclick="chooseGender('female')">Женский</button>
-        </div>
-      </div>
+    <img
+      src="assets/img/johnwick_gender.jpg"
+      alt="Choose your path"
+      class="wick-bg"
+    >
+
+    <!-- затемнение -->
+    <div class="wick-overlay"></div>
+
+    <!-- кликабельные зоны -->
+    <button
+      class="wick-zone wick-male"
+      onclick="chooseGender('male')"
+      aria-label="Мужской персонаж">
+    </button>
+
+    <button
+      class="wick-zone wick-female"
+      onclick="chooseGender('female')"
+      aria-label="Женский персонаж">
+    </button>
+
+    <!-- подписи -->
+    <div class="wick-label wick-label-male">
+      ASSASSIN
     </div>
+
+    <div class="wick-label wick-label-female">
+      BALLERINA
+    </div>
+
+  </div>
+
+</div>
+
 
     <!-- Шаг 2: Ник -->
     <div class="onboarding-step" id="step-nickname">
