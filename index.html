@@ -17,23 +17,29 @@
 <div id="screen-onboarding" class="screen">
   <div class="onboarding-card">
 
-    <!-- Шаг 1: Пол -->
-    <div class="onboarding-step active" id="step-gender">
-  <div class="gender-image-wrapper">
-    <img src="assets/img/gender_select.jpg" alt="Выбор персонажа">
-  </div>
-
-  <div class="gender-overlay">
-    <h1>Кто ты в Holostim?</h1>
-    <p>Выбери своего бойца</p>
-
-    <div class="gender-buttons">
-      <button class="male-btn" onclick="chooseGender('male')">Мужской</button>
-      <button class="female-btn" onclick="chooseGender('female')">Женский</button>
+    <!-- Индикатор шагов -->
+    <div class="steps-indicator">
+      <span class="step-dot active" data-step="1"></span>
+      <span class="step-dot" data-step="2"></span>
+      <span class="step-dot" data-step="3"></span>
     </div>
-  </div>
-</div>
 
+    <!-- Шаг 1: Пол -->
+    <div class="onboarding-step" id="step-gender">
+      <div class="gender-image-wrapper">
+        <img src="assets/img/gender_select.jpg" alt="Выбор персонажа">
+      </div>
+
+      <div class="gender-overlay">
+        <h1>Кто ты в Holostim?</h1>
+        <p>Выбери своего бойца</p>
+
+        <div class="gender-buttons">
+          <button class="male-btn" onclick="chooseGender('male')">Мужской</button>
+          <button class="female-btn" onclick="chooseGender('female')">Женский</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Шаг 2: Ник -->
     <div class="onboarding-step" id="step-nickname">

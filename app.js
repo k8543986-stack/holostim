@@ -48,6 +48,7 @@ function initOnboarding() {
 }
 
 function showStep(step) {
+  // шаги
   document.querySelectorAll('.onboarding-step').forEach(el => {
     el.classList.remove('active');
   });
@@ -60,6 +61,11 @@ function showStep(step) {
 
   const current = document.getElementById(stepsMap[step]);
   if (current) current.classList.add('active');
+
+  // индикатор
+  document.querySelectorAll('.step-dot').forEach(dot => {
+    dot.classList.toggle('active', Number(dot.dataset.step) === step);
+  });
 }
 
 function chooseGender(gender) {
