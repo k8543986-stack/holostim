@@ -19,14 +19,21 @@
 
     <!-- Шаг 1: Пол -->
     <div class="onboarding-step active" id="step-gender">
-      <h1>Добро пожаловать в Holostim</h1>
-      <p>Выбери пол своего бойца</p>
+  <div class="gender-image-wrapper">
+    <img src="assets/img/gender_select.jpg" alt="Выбор персонажа">
+  </div>
 
-      <div class="gender-buttons">
-        <button onclick="chooseGender('male')">Мужской</button>
-        <button onclick="chooseGender('female')">Женский</button>
-      </div>
+  <div class="gender-overlay">
+    <h1>Кто ты в Holostim?</h1>
+    <p>Выбери своего бойца</p>
+
+    <div class="gender-buttons">
+      <button class="male-btn" onclick="chooseGender('male')">Мужской</button>
+      <button class="female-btn" onclick="chooseGender('female')">Женский</button>
     </div>
+  </div>
+</div>
+
 
     <!-- Шаг 2: Ник -->
     <div class="onboarding-step" id="step-nickname">
@@ -54,7 +61,6 @@
 
   </div>
 </div>
-
 
 <!-- ================= ГЛАВНЫЙ ЭКРАН ================= -->
 <div id="screen-main" class="screen" style="display:none">
