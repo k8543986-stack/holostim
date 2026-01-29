@@ -286,4 +286,28 @@ body {
   -webkit-tap-highlight-color: transparent;
   background: var(--bg-dark);
 }
+/* ===== ФОН АККАУНТА ПО ПОЛУ ===== */
+
+.screen-main-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.35) saturate(1.2);
+}
+
+/* лёгкий затемняющий слой для читаемости UI */
+.screen-main-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,0.55),
+      rgba(0,0,0,0.85)
+    );
+}
 

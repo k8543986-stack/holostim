@@ -4,7 +4,19 @@
    CONFIG
 ======================= */
 
-const DEV_MODE = true; // ⬅️ В PROD просто поставишь false
+const DEV_MODE = true; // ⬅️ В PROD поставить false
+
+/* =======================
+   GLOBAL STATE
+======================= */
+
+let player = {};
+let appState = null;
+
+const AppState = {
+  NEW_USER: 'NEW_USER',
+  READY: 'READY'
+};
 
 /* =======================
    APP INIT
@@ -20,9 +32,19 @@ function initApp() {
   const saved = localStorage.getItem('holostim_player');
 
   if (saved) {
-    player = JSON.parse(saved);
+    try {
+      player = JSON.parse(saved);
+    } catch (e) {
+      console.error('Ошибка чтения профиля', e);
+      localStorage.removeItem('holostim_player');
+      showScreen('screen-onboarding');
+      showStep(1);
+      return;
+    }
+
     appState = AppState.READY;
     showScreen('screen-main');
+    applyAccountBackground();
   } else {
     appState = AppState.NEW_USER;
     showScreen('screen-onboarding');
@@ -48,6 +70,8 @@ function initOnboarding() {
 }
 
 function showStep(step) {
+  onboardingStep = step;
+
   // шаги
   document.querySelectorAll('.onboarding-step').forEach(el => {
     el.classList.remove('active');
@@ -72,31 +96,26 @@ function chooseGender(gender) {
   player.gender = gender;
 
   const screen = document.querySelector('.wick-gender-screen');
-  if (!screen) {
-    onboardingStep = 2;
-    showStep(onboardingStep);
-    return;
-  }
 
-  // добавляем классы анимации
-  screen.classList.add('choice-made');
-  screen.classList.add(gender === 'male' ? 'choice-male' : 'choice-female');
-
-  // небольшой хаптик (если Telegram)
+  // хаптик
   if (window.Telegram?.WebApp?.HapticFeedback) {
     Telegram.WebApp.HapticFeedback.impactOccurred('medium');
   }
 
-  // ждём анимацию и переходим дальше
-  setTimeout(() => {
-    onboardingStep = 2;
-    showStep(onboardingStep);
+  if (!screen) {
+    showStep(2);
+    return;
+  }
 
-    // чистим классы, чтобы не влияли дальше
+  // анимация
+  screen.classList.add('choice-made');
+  screen.classList.add(gender === 'male' ? 'choice-male' : 'choice-female');
+
+  setTimeout(() => {
+    showStep(2);
     screen.classList.remove('choice-made', 'choice-male', 'choice-female');
   }, 450);
 }
-
 
 function saveNickname() {
   const input = document.getElementById('nicknameInput');
@@ -106,12 +125,11 @@ function saveNickname() {
   }
 
   player.nickname = input.value.trim();
-  onboardingStep = 3;
-  showStep(onboardingStep);
+  showStep(3);
 }
 
 function finishRegistration() {
-  player.id = Date.now(); // временно
+  player.id = Date.now(); // временный ID
   player.level = 1;
   player.league = 'Новичок';
   player.xp = 0;
@@ -121,6 +139,22 @@ function finishRegistration() {
 
   appState = AppState.READY;
   showScreen('screen-main');
+  applyAccountBackground();
+}
+
+/* =======================
+   ACCOUNT BACKGROUND
+======================= */
+
+function applyAccountBackground() {
+  const bg = document.getElementById('main-bg');
+  if (!bg || !player || !player.gender) return;
+
+  if (player.gender === 'male') {
+    bg.style.backgroundImage = "url('assets/img/wick_male.jpg')";
+  } else if (player.gender === 'female') {
+    bg.style.backgroundImage = "url('assets/img/wick_female.jpg')";
+  }
 }
 
 /* =======================
@@ -138,5 +172,20 @@ function initDevTools() {
   const devBtn = document.getElementById('dev-reset-btn');
   if (devBtn) {
     devBtn.style.display = 'block';
+  }
+}
+
+/* =======================
+   SCREEN SWITCHER
+======================= */
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.style.display = 'none';
+  });
+
+  const screen = document.getElementById(id);
+  if (screen) {
+    screen.style.display = 'flex';
   }
 }
