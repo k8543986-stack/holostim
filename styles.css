@@ -27,6 +27,8 @@
   padding: 0;
   overflow-y: auto;
   background: var(--bg-dark);
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== Карточка онбординга ===== */
@@ -291,7 +293,7 @@ body {
 .screen-main-bg {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
