@@ -297,7 +297,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.35) saturate(1.2);
+  filter: brightness(1);
 }
 
 /* лёгкий затемняющий слой для читаемости UI */
