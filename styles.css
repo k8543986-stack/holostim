@@ -201,20 +201,29 @@
 /* ===== Поле ввода ника ===== */
 
 input[type="text"] {
+  display: block;
   width: 100%;
-  padding: 12px 14px;
-  margin: 18px 0;
-  border-radius: 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  margin: 18px 0 22px;
+  border-radius: 999px;
   border: 1px solid var(--border-soft);
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.45);
   color: var(--text-main);
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
 }
 
 input[type="text"]:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 10px rgba(255,204,51,0.35);
+  box-shadow: 0 0 12px rgba(255,204,51,0.35);
+}
+
+@supports (-webkit-touch-callout: none) {
+  input[type="text"] {
+    scroll-margin-top: 120px;
+  }
 }
 
 /* ===== Кнопки ===== */
