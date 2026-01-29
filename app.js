@@ -190,3 +190,10 @@ function showScreen(id) {
     screen.style.display = 'flex';
   }
 }
+// Экспорт функций в глобальную область для HTML
+window.chooseGender = chooseGender;
+window.saveNickname = saveNickname;
+window.finishRegistration = finishRegistration;
+window.resetAccount = resetAccount;
+window.showStep = showStep;
+
