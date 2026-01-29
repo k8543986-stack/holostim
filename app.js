@@ -148,13 +148,14 @@ function finishRegistration() {
 
 function applyAccountBackground() {
   const bg = document.getElementById('main-bg');
+  console.log('BG ELEMENT:', bg);
+  console.log('PLAYER:', player);
+
   if (!bg || !player || !player.gender) return;
 
-  if (player.gender === 'male') {
-    bg.style.backgroundImage = "url('assets/img/wick_male.jpg')";
-  } else if (player.gender === 'female') {
-    bg.style.backgroundImage = "url('assets/img/wick_female.jpg')";
-  }
+  bg.style.backgroundImage = "url('./assets/img/wick_male.jpg')";
+}
+
 }
 
 /* =======================
