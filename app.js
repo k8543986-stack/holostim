@@ -156,8 +156,6 @@ function applyAccountBackground() {
   bg.style.backgroundImage = "url('./assets/img/wick_male.jpg')";
 }
 
-}
-
 /* =======================
    DEV TOOLS
 ======================= */
