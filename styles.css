@@ -26,7 +26,7 @@
   min-height: -webkit-fill-available;
   padding: 0;
   overflow-y: auto;
-  background: var(--bg-dark);
+  background: transparent;
   position: relative;
   z-index: 1;
 }
