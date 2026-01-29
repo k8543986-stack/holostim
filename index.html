@@ -3,21 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <title>Holostim — Mini App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 
   <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Основные стили -->
   <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    /* Временные стили для видимости */
+    * {
+      box-sizing: border-box;
+    }
+    
+    /* Для iOS Safari - фикс высоты */
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+  </style>
 </head>
 <body>
-  <div id="main-bg" class="screen-main-bg"></div>
 
 <!-- ================= ЭКРАН ОНБОРДИНГА ================= -->
 <div id="screen-onboarding" class="screen">
   <div class="onboarding-card">
-
+    
     <!-- Индикатор шагов -->
     <div class="steps-indicator">
       <span class="step-dot active" data-step="1"></span>
@@ -26,45 +41,48 @@
     </div>
 
     <!-- Шаг 1: Выбор персонажа -->
-<div class="onboarding-step" id="step-gender">
+    <div class="onboarding-step active" id="step-gender">
+      <h1>Выбери своего бойца</h1>
+      <p>Этот выбор определит твой фон</p>
 
-  <div class="wick-gender-screen">
+      <div class="wick-gender-screen">
+        <img
+          src="assets/img/johnwick_gender.jpg"
+          alt="Choose your path"
+          class="wick-bg"
+        >
 
-    <img
-      src="assets/img/johnwick_gender.jpg"
-      alt="Choose your path"
-      class="wick-bg"
-    >
+        <!-- затемнение -->
+        <div class="wick-overlay"></div>
 
-    <!-- затемнение -->
-    <div class="wick-overlay"></div>
+        <!-- кликабельные зоны -->
+        <button
+          class="wick-zone wick-male"
+          onclick="chooseGender('male')"
+          aria-label="Мужской персонаж">
+        </button>
 
-    <!-- кликабельные зоны -->
-    <button
-      class="wick-zone wick-male"
-      onclick="chooseGender('male')"
-      aria-label="Мужской персонаж">
-    </button>
+        <button
+          class="wick-zone wick-female"
+          onclick="chooseGender('female')"
+          aria-label="Женский персонаж">
+        </button>
 
-    <button
-      class="wick-zone wick-female"
-      onclick="chooseGender('female')"
-      aria-label="Женский персонаж">
-    </button>
+        <!-- подписи -->
+        <div class="wick-label wick-label-male">
+          МУЖЧИНА
+        </div>
 
-    <!-- подписи -->
-    <div class="wick-label wick-label-male">
-      МУЖЧИНА
+        <div class="wick-label wick-label-female">
+          ДЕВУШКА
+        </div>
+      </div>
+
+      <!-- Кнопка пропуска (опционально) -->
+      <button class="btn-ghost" onclick="chooseGender('male')" style="margin-top: 20px; font-size: 12px;">
+        Пропустить, выбрать позже
+      </button>
     </div>
-
-    <div class="wick-label wick-label-female">
-      ДЕВУШКА
-    </div>
-
-  </div>
-
-</div>
-
 
     <!-- Шаг 2: Ник -->
     <div class="onboarding-step" id="step-nickname">
@@ -73,6 +91,10 @@
 
       <input type="text" id="nicknameInput" placeholder="Введите ник">
       <button class="btn-primary" onclick="saveNickname()">Далее</button>
+      
+      <button class="btn-ghost" onclick="showStep(1)" style="margin-top: 12px; font-size: 12px;">
+        ← Назад
+      </button>
     </div>
 
     <!-- Шаг 3: Согласие -->
@@ -88,6 +110,10 @@
       <button class="btn-primary" id="finishBtn" disabled onclick="finishRegistration()">
         Создать аккаунт
       </button>
+      
+      <button class="btn-ghost" onclick="showStep(2)" style="margin-top: 12px; font-size: 12px;">
+        ← Назад
+      </button>
     </div>
 
   </div>
@@ -95,123 +121,169 @@
 
 <!-- ================= ГЛАВНЫЙ ЭКРАН ================= -->
 <div id="screen-main" class="screen" style="display:none">
+  <!-- Фоновый элемент ТОЛЬКО для главного экрана -->
+  <div class="screen-main-bg" id="main-bg"></div>
 
-<header>
-  <div>
-    <div class="title">HOLOSTIM</div>
-    <div class="subtitle">Профиль стрелка · Личный склад</div>
-  </div>
-  <div class="balance" id="headerBalance">
-    Загрузка...
-  </div>
-</header>
+  <div class="main-container">
+    <header>
+      <div>
+        <div class="title">HOLOSTIM</div>
+        <div class="subtitle">Профиль стрелка · Личный склад</div>
+      </div>
+      <div class="balance" id="headerBalance">
+        Загрузка...
+      </div>
+    </header>
 
-<nav class="top-tabs">
-  <button class="tab active" data-tab="sklad">Склад</button>
-  <button class="tab" data-tab="progress">Прогресс</button>
-  <button class="tab" data-tab="shop">Магазин</button>
-</nav>
+    <nav class="top-tabs">
+      <button class="tab active" data-tab="sklad">Склад</button>
+      <button class="tab" data-tab="progress">Прогресс</button>
+      <button class="tab" data-tab="shop">Магазин</button>
+    </nav>
 
+    <main>
+      <!-- Вкладка СКЛАД -->
+      <section class="tab-content active" id="tab-sklad">
+        <div class="layout">
+          <section class="character-card">
+            <div class="character-header">
+              <div class="character-class">Стрелок Holostim</div>
+              <div class="character-level" id="charLevel">LVL 1 · Новичок</div>
+            </div>
 
-<main>
-  <!-- Вкладка СКЛАД -->
-  <section class="tab-content active" id="tab-sklad">
-    <div class="layout">
-      <section class="character-card">
-        <div class="character-header">
-          <div class="character-class">Стрелок Holostim</div>
-          <div class="character-level" id="charLevel">LVL 1 · Новичок</div>
-        </div>
+            <div class="character-body">
+              <div class="avatar-wrapper" id="avatar">
+                Фото
+              </div>
+              <label class="upload-avatar-btn">
+                <input type="file" accept="image/*" id="avatarInput">
+                <span>Загрузить фото</span>
+              </label>
 
-        <div class="character-body">
-          <div class="avatar-wrapper" id="avatar">
-            Фото
-          </div>
-          <label class="upload-avatar-btn">
-            <input type="file" accept="image/*" id="avatarInput">
-            <span>Загрузить фото</span>
-          </label>
+              <div class="character-silhouette">
+                Тут будет модель бойца
+              </div>
+            </div>
 
-          <div class="character-silhouette">
-            Тут будет модель бойца
-          </div>
-        </div>
+            <div class="character-footer">
+              <div class="xp-bar-label">
+                <span>Прогресс</span>
+                <span id="xpLabel">0 / 100 XP</span>
+              </div>
+              <div class="xp-bar">
+                <div class="xp-bar-fill" id="xpFill" style="width:0%"></div>
+              </div>
+              <div class="character-actions">
+                <button class="btn-primary" onclick="startSession()">В БОЙ</button>
+                <button class="btn-ghost">Тарифы</button>
+              </div>
+            </div>
+          </section>
 
-        <div class="character-footer">
-          <div class="xp-bar-label">
-            <span>Прогресс</span>
-            <span id="xpLabel">0 / 100 XP</span>
-          </div>
-          <div class="xp-bar">
-            <div class="xp-bar-fill" id="xpFill" style="width:0%"></div>
-          </div>
-          <div class="character-actions">
-            <button class="btn-primary" onclick="startSession()">В БОЙ</button>
-            <button class="btn-ghost">Тарифы</button>
-          </div>
+          <section class="right-column">
+            <div class="panel">
+              <div class="panel-title">Режимы</div>
+              <div class="modes-grid">
+                <div class="mode-card">Стандарт</div>
+                <div class="mode-card">Реакция</div>
+                <div class="mode-card">Дуэль</div>
+                <div class="mode-card">Ночной</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Ачивки</div>
+              <div class="achievements-list">
+                <div class="ach-badge gold">⭐ Новобранец</div>
+                <div class="ach-badge silver">🎯 Меткий</div>
+                <div class="ach-badge bronze">🔥 Серия</div>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
 
-      <section class="right-column">
-        <div class="panel">
-          <div class="panel-title">Режимы</div>
-          <div class="modes-grid">
-            <div class="mode-card">Стандарт</div>
-            <div class="mode-card">Реакция</div>
-            <div class="mode-card">Дуэль</div>
-            <div class="mode-card">Ночной</div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">Ачивки</div>
-          <div class="achievements-list">
-            <div class="ach-badge gold">⭐ Новобранец</div>
-            <div class="ach-badge silver">🎯 Меткий</div>
-            <div class="ach-badge bronze">🔥 Серия</div>
-          </div>
+      <section class="tab-content" id="tab-progress">
+        <div class="placeholder-card">
+          Здесь будет история сессий
         </div>
       </section>
-    </div>
-  </section>
 
-  <section class="tab-content" id="tab-progress">
-    <div class="placeholder-card">
-      Здесь будет история сессий
-    </div>
-  </section>
-
-  <section class="tab-content" id="tab-shop">
-    <div class="placeholder-card">
-      Магазин и подписки
-    </div>
-  </section>
-  <!-- DEV кнопка (видна только в разработке) -->
-<button
-  id="dev-reset-btn"
-  onclick="resetAccount()"
-  style="
-    display:none;
-    margin: 24px auto 0;
-    padding: 8px 14px;
-    font-size: 12px;
-    opacity: 0.6;
-    border-radius: 999px;
-    border: 1px dashed rgba(255,255,255,0.4);
-    background: transparent;
-    color: #fff;
-  ">
-  🔄 Сбросить аккаунт (DEV)
-</button>
-</main>
-
-
+      <section class="tab-content" id="tab-shop">
+        <div class="placeholder-card">
+          Магазин и подписки
+        </div>
+      </section>
+      
+      <!-- DEV кнопка (видна только в разработке) -->
+      <button
+        id="dev-reset-btn"
+        onclick="resetAccount()"
+        style="
+          display: none;
+          margin: 24px auto 0;
+          padding: 8px 14px;
+          font-size: 12px;
+          opacity: 0.6;
+          border-radius: 999px;
+          border: 1px dashed rgba(255,255,255,0.4);
+          background: transparent;
+          color: #fff;
+          cursor: pointer;
+        ">
+        🔄 Сбросить аккаунт (DEV)
+      </button>
+    </main>
+  </div>
 </div>
 
 <!-- ================= ПОДКЛЮЧЕНИЕ ЛОГИКИ ================= -->
 <script src="state.js"></script>
 <script src="ui.js"></script>
 <script src="app.js"></script>
+
+<script>
+  // Инициализация Telegram WebApp
+  document.addEventListener('DOMContentLoaded', function() {
+    // Растягиваем на весь экран в Telegram
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.expand();
+      tg.enableClosingConfirmation();
+    }
+    
+    // Фикс для iOS Safari 100vh проблемы
+    function setFullHeight() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => {
+        screen.style.minHeight = window.innerHeight + 'px';
+      });
+      
+      const cards = document.querySelectorAll('.onboarding-card');
+      cards.forEach(card => {
+        card.style.minHeight = window.innerHeight + 'px';
+      });
+    }
+    
+    // Установить высоту при загрузке и изменении размера
+    setFullHeight();
+    window.addEventListener('resize', setFullHeight);
+    window.addEventListener('orientationchange', setFullHeight);
+    
+    // Проверка изображений (fallback если нет картинок)
+    setTimeout(() => {
+      const bgImg = document.querySelector('.wick-bg');
+      if (bgImg && bgImg.naturalHeight === 0) {
+        console.warn('Фоновое изображение не загружено');
+        bgImg.style.display = 'none';
+        document.querySelector('.wick-gender-screen').style.background = 'linear-gradient(135deg, #1a1a2e, #16213e)';
+      }
+    }, 1000);
+  });
+</script>
 
 </body>
 </html>
