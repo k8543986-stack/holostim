@@ -297,7 +297,6 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: none !important;
 }
 
 /* лёгкий затемняющий слой для читаемости UI */
@@ -308,8 +307,9 @@ body {
   background:
     linear-gradient(
       180deg,
-      rgba(0,0,0,0.55),
-      rgba(0,0,0,0.85)
+      rgba(0,0,0,0.2),
+      rgba(0,0,0,0.5)
     );
 }
+
 
