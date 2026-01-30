@@ -10,14 +10,6 @@ const DEV_MODE = true;
    GLOBAL STATE
 ======================= */
 
-let player = {};
-let appState = null;
-
-const AppState = {
-  NEW_USER: 'NEW_USER',
-  READY: 'READY'
-};
-
 /* =======================
    APP INIT
 ======================= */
