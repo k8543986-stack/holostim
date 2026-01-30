@@ -4,7 +4,7 @@
    CONFIG
 ======================= */
 
-const DEV_MODE = true; // ⬅️ В PROD поставить false
+const DEV_MODE = true;
 
 /* =======================
    GLOBAL STATE
@@ -72,7 +72,6 @@ function initOnboarding() {
 function showStep(step) {
   onboardingStep = step;
 
-  // шаги
   document.querySelectorAll('.onboarding-step').forEach(el => {
     el.classList.remove('active');
   });
@@ -86,36 +85,22 @@ function showStep(step) {
   const current = document.getElementById(stepsMap[step]);
   if (current) current.classList.add('active');
 
-  // индикатор
   document.querySelectorAll('.step-dot').forEach(dot => {
     dot.classList.toggle('active', Number(dot.dataset.step) === step);
   });
 }
 
+/* ===== ВЫБОР ПОЛА (УПРОЩЁННЫЙ, ЖЕЛЕЗНЫЙ) ===== */
+
 function chooseGender(gender) {
+  console.log("Выбран пол:", gender);
   player.gender = gender;
-
-  const screen = document.querySelector('.wick-gender-screen');
-
-  // хаптик
-  if (window.Telegram?.WebApp?.HapticFeedback) {
-    Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-  }
-
-  if (!screen) {
-    showStep(2);
-    return;
-  }
-
-  // анимация
-  screen.classList.add('choice-made');
-  screen.classList.add(gender === 'male' ? 'choice-male' : 'choice-female');
-
-  setTimeout(() => {
-    showStep(2);
-    screen.classList.remove('choice-made', 'choice-male', 'choice-female');
-  }, 450);
+  showStep(2);
 }
+
+/* =======================
+   NICKNAME
+======================= */
 
 function saveNickname() {
   const input = document.getElementById('nicknameInput');
@@ -128,8 +113,12 @@ function saveNickname() {
   showStep(3);
 }
 
+/* =======================
+   FINISH
+======================= */
+
 function finishRegistration() {
-  player.id = Date.now(); // временный ID
+  player.id = Date.now();
   player.level = 1;
   player.league = 'Новичок';
   player.xp = 0;
@@ -153,7 +142,11 @@ function applyAccountBackground() {
 
   if (!bg || !player || !player.gender) return;
 
-  bg.style.backgroundImage = "url('./assets/img/wick_male.jpg')";
+  if (player.gender === 'male') {
+    bg.style.backgroundImage = "url('./assets/img/wick_male.jpg')";
+  } else {
+    bg.style.backgroundImage = "url('./assets/img/wick_female.jpg')";
+  }
 }
 
 /* =======================
@@ -188,10 +181,13 @@ function showScreen(id) {
     screen.style.display = 'flex';
   }
 }
-// Экспорт функций в глобальную область для HTML
+
+/* =======================
+   EXPORT TO HTML
+======================= */
+
 window.chooseGender = chooseGender;
 window.saveNickname = saveNickname;
 window.finishRegistration = finishRegistration;
 window.resetAccount = resetAccount;
 window.showStep = showStep;
-
