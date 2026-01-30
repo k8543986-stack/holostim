@@ -32,7 +32,7 @@
 <!-- ================= ЭКРАН ОНБОРДИНГА ================= -->
 <div id="screen-onboarding" class="screen">
   <div class="onboarding-card">
-    
+
     <!-- Индикатор шагов -->
     <div class="steps-indicator">
       <span class="step-dot active" data-step="1"></span>
@@ -40,58 +40,36 @@
       <span class="step-dot" data-step="3"></span>
     </div>
 
-    <!-- Шаг 1: Выбор персонажа -->
+    <!-- Шаг 1 -->
     <div class="onboarding-step active" id="step-gender">
       <h1>Выбери своего бойца</h1>
       <p>Этот выбор определит твой фон</p>
 
       <div class="wick-gender-screen">
-        <img
-          src="assets/img/johnwick_gender.jpg"
-          alt="Choose your path"
-          class="wick-bg"
-        >
-
-        <!-- затемнение -->
+        <img src="assets/img/johnwick_gender.jpg" class="wick-bg">
         <div class="wick-overlay"></div>
 
-        <!-- кликабельные зоны -->
-        <button
-          class="wick-zone wick-male"
-          onclick="chooseGender('male')"
-          aria-label="Мужской персонаж">
-        </button>
+        <button class="wick-zone wick-male"
+                onclick="chooseGender('male')"></button>
 
-        <button
-          class="wick-zone wick-female"
-          onclick="chooseGender('female')"
-          aria-label="Женский персонаж">
-        </button>
+        <button class="wick-zone wick-female"
+                onclick="chooseGender('female')"></button>
 
-        <!-- подписи -->
-        <div class="wick-label wick-label-male">
-          МУЖЧИНА
-        </div>
-
-        <div class="wick-label wick-label-female">
-          ДЕВУШКА
-        </div>
+        <div class="wick-label wick-label-male">МУЖЧИНА</div>
+        <div class="wick-label wick-label-female">ДЕВУШКА</div>
       </div>
+    </div>
 
-    <!-- Шаг 2: Ник -->
+    <!-- Шаг 2 -->
     <div class="onboarding-step" id="step-nickname">
       <h1>Как тебя называть?</h1>
       <p>Этот ник будут видеть в системе</p>
 
       <input type="text" id="nicknameInput" placeholder="Введите ник">
       <button class="btn-primary" onclick="saveNickname()">Далее</button>
-      
-      <button class="btn-ghost" onclick="showStep(1)" style="margin-top: 12px; font-size: 12px;">
-        ← Назад
-      </button>
     </div>
 
-    <!-- Шаг 3: Согласие -->
+    <!-- Шаг 3 -->
     <div class="onboarding-step" id="step-consent">
       <h1>Почти готово</h1>
       <p>Подтверди согласие на обработку данных</p>
@@ -101,12 +79,9 @@
         Я согласен на обработку персональных данных
       </label>
 
-      <button class="btn-primary" id="finishBtn" disabled onclick="finishRegistration()">
+      <button class="btn-primary" id="finishBtn" disabled
+              onclick="finishRegistration()">
         Создать аккаунт
-      </button>
-      
-      <button class="btn-ghost" onclick="showStep(2)" style="margin-top: 12px; font-size: 12px;">
-        ← Назад
       </button>
     </div>
 
