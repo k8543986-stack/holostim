@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: system-ui;
+}
+
+.account-bg {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.hud {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  padding: 20px;
+}
+
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nickname {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.level {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.xp-bar {
+  width: 160px;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.xp-fill {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #ffcc33, #ff9f43);
+  border-radius: 4px;
+}
+
+.hud-right {
+  position: absolute;
+  right: 20px;
+  top: 100px;
+  width: 220px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.rating-row {
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-battle {
+  position: absolute;
+  bottom: 30px;
+  left: 20px;
+  right: 20px;
+  padding: 16px;
+  border-radius: 999px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #ffcc33, #ff9f43);
+}

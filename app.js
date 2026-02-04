@@ -1,56 +1,25 @@
 // app.js
 
-/* =======================
-   CONFIG
-======================= */
-
 const DEV_MODE = true;
-
-/* =======================
-   GLOBAL STATE
-======================= */
 
 /* =======================
    APP INIT
 ======================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initApp();
   initOnboarding();
   initDevTools();
 });
 
-function initApp() {
-  const saved = localStorage.getItem('holostim_player');
-
-  if (saved) {
-    try {
-      player = JSON.parse(saved);
-    } catch (e) {
-      console.error('Ошибка чтения профиля', e);
-      localStorage.removeItem('holostim_player');
-      showScreen('screen-onboarding');
-      showStep(1);
-      return;
-    }
-
-    appState = AppState.READY;
-    showScreen('screen-main');
-    applyAccountBackground();
-  } else {
-    appState = AppState.NEW_USER;
-    showScreen('screen-onboarding');
-    showStep(1);
-  }
-}
+let onboardingStep = 1;
 
 /* =======================
    ONBOARDING
 ======================= */
 
-let onboardingStep = 1;
-
 function initOnboarding() {
+  showStep(1);
+
   const consentCheckbox = document.getElementById('consentCheckbox');
   const finishBtn = document.getElementById('finishBtn');
 
@@ -82,7 +51,9 @@ function showStep(step) {
   });
 }
 
-/* ===== ВЫБОР ПОЛА (УПРОЩЁННЫЙ, ЖЕЛЕЗНЫЙ) ===== */
+/* =======================
+   GENDER
+======================= */
 
 function chooseGender(gender) {
   console.log("Выбран пол:", gender);
@@ -118,31 +89,12 @@ function finishRegistration() {
 
   localStorage.setItem('holostim_player', JSON.stringify(player));
 
-  appState = AppState.READY;
-  showScreen('screen-main');
-  applyAccountBackground();
+  // ПЕРЕХОД В АККАУНТ
+  window.location.href = 'account.html';
 }
 
 /* =======================
-   ACCOUNT BACKGROUND
-======================= */
-
-function applyAccountBackground() {
-  const bg = document.getElementById('main-bg');
-  console.log('BG ELEMENT:', bg);
-  console.log('PLAYER:', player);
-
-  if (!bg || !player || !player.gender) return;
-
-  if (player.gender === 'male') {
-    bg.style.backgroundImage = "url('./assets/img/wick_male.jpg')";
-  } else {
-    bg.style.backgroundImage = "url('./assets/img/wick_female.jpg')";
-  }
-}
-
-/* =======================
-   DEV TOOLS
+   DEV
 ======================= */
 
 function resetAccount() {
@@ -152,30 +104,12 @@ function resetAccount() {
 
 function initDevTools() {
   if (!DEV_MODE) return;
-
   const devBtn = document.getElementById('dev-reset-btn');
-  if (devBtn) {
-    devBtn.style.display = 'block';
-  }
+  if (devBtn) devBtn.style.display = 'block';
 }
 
 /* =======================
-   SCREEN SWITCHER
-======================= */
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.style.display = 'none';
-  });
-
-  const screen = document.getElementById(id);
-  if (screen) {
-    screen.style.display = 'flex';
-  }
-}
-
-/* =======================
-   EXPORT TO HTML
+   EXPORT
 ======================= */
 
 window.chooseGender = chooseGender;
