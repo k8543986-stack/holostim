@@ -16,3 +16,14 @@ if (player.gender === 'male') {
 } else {
   bg.style.backgroundImage = "url('assets/img/wick_female.jpg')";
 }
+const resetBtn = document.getElementById('dev-reset-btn');
+
+if (resetBtn) {
+  resetBtn.onclick = () => {
+
+    localStorage.removeItem('holostim_player');
+
+    window.location.href = 'index.html';
+
+  };
+}
