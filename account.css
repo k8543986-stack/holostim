@@ -52,19 +52,23 @@ body {
 
 .hud-right {
   position: absolute;
-  right: 20px;
-  top: 100px;
-  width: 220px;
-  background: rgba(0,0,0,0.55);
+
+  right: 10px;     /* ближе к краю */
+  top: 110px;
+
+  width: 170px;    /* меньше ширина */
+
+  background: rgba(0,0,0,0.45);
   backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 12px;
+
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .rating-row {
-  font-size: 13px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .btn-battle {
