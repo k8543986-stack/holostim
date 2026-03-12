@@ -2,11 +2,78 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Holostim — Account</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Holostim — Аккаунт</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="account.css">
+    
+    <style>
+        /* Дополнительные стили для улучшения интерфейса */
+        .rank-title {
+            font-size: 14px;
+            color: #ffcc33;
+            margin: 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .xp-text {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+        }
+        
+        .nav-buttons {
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 14px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,204,51,0.2);
+            border-color: #ffcc33;
+        }
+        
+        .nav-btn.ranks {
+            background: linear-gradient(90deg, rgba(255,204,51,0.2), rgba(255,159,67,0.2));
+            border-color: #ffcc33;
+        }
+        
+        .player-stats {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .league-badge {
+            background: rgba(255,204,51,0.15);
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,204,51,0.3);
+            font-size: 12px;
+            color: #ffcc33;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,45 +81,87 @@
 
     <div class="hud">
 
-        <!-- Верх -->
+        <!-- Верхняя панель -->
         <div class="hud-top">
             <div class="player-block">
-                <div class="nickname" id="nickname">PLAYER</div>
-                <div class="level" id="level">Уровень 1</div>
-                <div class="xp-bar">
-                    <div class="xp-fill" id="xpFill"></div>
+                <div class="player-stats">
+                    <div class="nickname" id="nickname">PLAYER</div>
+                    <div class="rank-title" id="rankTitle">Начинающий стрелок</div>
+                    <div class="league-badge" id="league">Твёрдая рука</div>
+                </div>
+                
+                <!-- Прогресс XP -->
+                <div style="margin-top: 12px;">
+                    <div class="xp-bar">
+                        <div class="xp-fill" id="xpFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="xp-text" id="xpText">0 / 100 XP</div>
                 </div>
             </div>
 
             <div class="league-block">
-                <div class="league-title">ЛИГА</div>
-                <div class="league-name" id="league">Новичок</div>
+                <div class="league-title">СЛЕДУЮЩЕЕ</div>
+                <div class="league-name" id="nextRank">Рекрут</div>
+                <div style="font-size: 11px; color: #9aa3b5; margin-top: 4px;" id="xpNeeded">нужно 30 XP</div>
             </div>
         </div>
 
-        <!-- Правая панель -->
+        <!-- Правая панель (рейтинг) -->
         <div class="hud-right">
-            <div class="rating-title">РЕЙТИНГ</div>
+            <div class="rating-title">ТОП РЕЙТИНГА</div>
             <div class="rating-list">
                 <div class="rating-row">1 · donk666 · 5075</div>
                 <div class="rating-row">2 · SEMEN_BAKIN · 4852</div>
                 <div class="rating-row">3 · m0NESY · 4790</div>
+                <div class="rating-row" style="border-bottom: none; color: #ffcc33; margin-top: 8px;">
+                    ТВОЁ МЕСТО: #42
+                </div>
+            </div>
+            
+            <!-- Статистика игрока -->
+            <div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                    <span>Сессий:</span>
+                    <span id="sessionsCount" style="color: #ffcc33;">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                    <span>Точность:</span>
+                    <span id="accuracy" style="color: #ffcc33;">0%</span>
+                </div>
             </div>
         </div>
 
+        <!-- Кнопки навигации (звания и ачивки) -->
+        <div class="nav-buttons">
+            <button class="nav-btn ranks" onclick="location.href='rank_tree.html'">
+                🌳 ЗВАНИЯ
+            </button>
+            <button class="nav-btn" onclick="location.href='achievements.html'">
+                🏆 АЧИВКИ
+            </button>
+        </div>
+
         <!-- Кнопка БОЙ -->
-        <button class="btn-battle">
+        <button class="btn-battle" onclick="startBattle()">
             В БОЙ
         </button>
 
     </div> <!-- конец hud -->
+    
     <!-- DEV кнопка сброса -->
     <button id="dev-reset-btn" class="dev-reset-btn">
         🔄 Сброс аккаунта
     </button>
 
-
     <script src="account.js"></script>
+    
+    <script>
+        // Дополнительная логика для обработки кликов
+        function startBattle() {
+            alert('⚡ Режим боя скоро будет доступен!');
+            // Здесь будет переход на экран сессии
+        }
+    </script>
 
 </body>
 </html>
