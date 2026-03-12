@@ -252,3 +252,10 @@ console.log('Player data:', player);
 console.log('Current rank:', currentRank);
 console.log('Next rank:', nextRank);
 console.log('XP progress:', xpProgress, '/', xpNeeded, '(', progressPercent.toFixed(1), '%)');
+// Получаем своё место в рейтинге
+const playerRank = localStorage.getItem('player_rating_position');
+const playerRankElement = document.getElementById('playerRank');
+
+if (playerRankElement && playerRank) {
+    playerRankElement.innerText = '#' + playerRank;
+}

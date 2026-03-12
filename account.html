@@ -107,29 +107,30 @@
         </div>
 
         <!-- Правая панель (рейтинг) -->
-        <div class="hud-right">
-            <div class="rating-title">ТОП РЕЙТИНГА</div>
-            <div class="rating-list">
-                <div class="rating-row">1 · donk666 · 5075</div>
-                <div class="rating-row">2 · SEMEN_BAKIN · 4852</div>
-                <div class="rating-row">3 · m0NESY · 4790</div>
-                <div class="rating-row" style="border-bottom: none; color: #ffcc33; margin-top: 8px;">
-                    ТВОЁ МЕСТО: #42
-                </div>
-            </div>
-            
-            <!-- Статистика игрока -->
-            <div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-                    <span>Сессий:</span>
-                    <span id="sessionsCount" style="color: #ffcc33;">0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                    <span>Точность:</span>
-                    <span id="accuracy" style="color: #ffcc33;">0%</span>
-                </div>
-            </div>
+<div class="hud-right">
+    <div class="rating-title">ТОП РЕЙТИНГА</div>
+    <div class="rating-list">
+        <div class="rating-row">1 · donk666 · 5075</div>
+        <div class="rating-row">2 · SEMEN_BAKIN · 4852</div>
+        <div class="rating-row">3 · m0NESY · 4790</div>
+        <!-- ВОТ ЭТОТ БЛОК МЕНЯЕМ -->
+        <div class="rating-row" style="border-bottom: none; color: #ffcc33; margin-top: 8px; cursor: pointer;" onclick="location.href='ratings.html'">
+            ТВОЁ МЕСТО: <span id="playerRank">#42</span> 👆
         </div>
+    </div>
+    
+    <!-- Статистика игрока -->
+    <div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+            <span>Сессий:</span>
+            <span id="sessionsCount" style="color: #ffcc33;">0</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+            <span>Точность:</span>
+            <span id="accuracy" style="color: #ffcc33;">0%</span>
+        </div>
+    </div>
+</div>
 
         <!-- Кнопки навигации (звания и ачивки) -->
         <div class="nav-buttons">
