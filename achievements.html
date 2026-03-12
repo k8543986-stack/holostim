@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Holostim — Достижения</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .achievements-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            color: white;
+        }
+        
+        .achievement-card {
+            background: rgba(10,12,20,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #ffcc33, #ff9f43);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+        }
+        
+        .achievement-info {
+            flex: 1;
+        }
+        
+        .achievement-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e6e8ef;
+            margin-bottom: 4px;
+        }
+        
+        .achievement-desc {
+            font-size: 12px;
+            color: #9aa3b5;
+        }
+        
+        .achievement-status {
+            width: 30px;
+            text-align: right;
+            font-size: 20px;
+        }
+        
+        .achievement-completed {
+            color: #4CAF50;
+        }
+        
+        .achievement-locked {
+            color: #666;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .stats-bar {
+            background: rgba(10,12,20,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .stats-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffcc33;
+        }
+        
+        .stats-label {
+            font-size: 14px;
+            color: #9aa3b5;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="history.back()">←</button>
+    
+    <div class="achievements-container">
+        <h1 style="text-align: center; margin-bottom: 30px;">🏆 ДОСТИЖЕНИЯ</h1>
+        
+        <div id="stats" class="stats-bar">
+            <div class="stats-number" id="completedCount">0/4</div>
+            <div class="stats-label">достижений получено</div>
+        </div>
+        
+        <div id="achievementsList"></div>
+    </div>
+
+    <script>
+        const ACHIEVEMENTS = [
+            {"id": "killer_tens", "title": "Убийца «десяток»", "description": "Набрать 10 очков меткости в одной сессии"},
+            {"id": "silence_breaker", "title": "Пробивающий тишину", "description": "Сделать первый выстрел в сессии"},
+            {"id": "master_shooter", "title": "Мастер точного выстрела", "description": "Попасть в яблочко 5 раз подряд"},
+            {"id": "master_burst", "title": "Мастер серийного огня", "description": "Провести 3 сессии за один день"}
+        ];
+        
+        // Здесь будут храниться выполненные ачивки игрока
+        // Пока для примера - первые две выполнены
+        const completedAchievements = ['killer_tens', 'silence_breaker'];
+        
+        function renderAchievements() {
+            const container = document.getElementById('achievementsList');
+            const completedCount = document.getElementById('completedCount');
+            
+            completedCount.textContent = `${completedAchievements.length}/${ACHIEVEMENTS.length}`;
+            
+            let html = '';
+            
+            ACHIEVEMENTS.forEach(ach => {
+                const isCompleted = completedAchievements.includes(ach.id);
+                
+                html += `
+                    <div class="achievement-card" style="opacity: ${isCompleted ? 1 : 0.6}">
+                        <div class="achievement-icon">${isCompleted ? '🏆' : '🔒'}</div>
+                        <div class="achievement-info">
+                            <div class="achievement-title">${ach.title}</div>
+                            <div class="achievement-desc">${ach.description}</div>
+                        </div>
+                        <div class="achievement-status ${isCompleted ? 'achievement-completed' : 'achievement-locked'}">
+                            ${isCompleted ? '✓' : '?'}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        renderAchievements();
+    </script>
+</body>
+</html>
