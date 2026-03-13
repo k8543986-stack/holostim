@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Holostim — В бой</title>
+    <title>Holostim — Сканирование QR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     
     <style>
@@ -87,29 +87,10 @@
             z-index: 100;
             text-decoration: none;
         }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #ffcc33;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .success {
-            color: #4CAF50;
-        }
-        
-        .error {
-            color: #f44336;
-        }
     </style>
+    
+    <!-- Подключаем библиотеку для сканирования QR -->
+    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
     <a href="account.html" class="back-btn">←</a>
@@ -130,12 +111,18 @@
         </div>
     </div>
     
-    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
     <script>
         // Получаем данные игрока
         const player = JSON.parse(localStorage.getItem('holostim_player'));
         if (!player) {
             window.location.href = 'index.html';
+        }
+        
+        // Получаем IP ПК
+        const pcIP = localStorage.getItem('holostim_pc_ip');
+        if (!pcIP) {
+            alert('Сначала настройте подключение к ПК');
+            window.location.href = 'account.html';
         }
         
         // Элементы интерфейса
@@ -193,9 +180,6 @@
                         
                         // Отправляем данные на ПК
                         try {
-                            // Определяем IP ПК с Holostim (можно сохранять в настройках)
-                            const pcIP = localStorage.getItem('holostim_pc_ip') || '192.168.1.100';
-                            
                             const response = await fetch(`http://${pcIP}:8000/api/connect`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -212,7 +196,7 @@
                                 statusMessage.innerHTML = '✅ Подключено!';
                                 statusDetail.innerHTML = 'Сессия запущена';
                                 
-                                // Переходим на экран сессии через 2 секунды
+                                // Переходим на экран сессии
                                 setTimeout(() => {
                                     window.location.href = 'session.html?session=' + sessionId;
                                 }, 2000);
@@ -241,19 +225,6 @@
             
             requestAnimationFrame(scanQR);
         }
-        
-        // Добавляем поле для ввода IP ПК (можно в настройках)
-        function showPCSettings() {
-            const ip = prompt('Введите IP-адрес компьютера с Holostim:', 
-                             localStorage.getItem('holostim_pc_ip') || '192.168.1.100');
-            if (ip) {
-                localStorage.setItem('holostim_pc_ip', ip);
-                statusDetail.innerHTML = `ПК: ${ip}`;
-            }
-        }
-        
-        // Кнопка настроек (можно добавить в интерфейс)
-        // showPCSettings();
         
         // Запускаем камеру
         startCamera();
