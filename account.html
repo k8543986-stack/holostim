@@ -217,38 +217,44 @@
     <script src="account.js"></script>
     
     <script>
-        // Дополнительная логика для обработки кликов
+        // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С HOLOSTIM ПК ==========
         
-        // Функция начала боя - теперь переходит на сканирование QR
+        // Функция начала боя - переход на сканирование QR
         function startBattle() {
-            // Проверяем, настроен ли ПК
             const pcIP = localStorage.getItem('holostim_pc_ip');
-            if (!pcIP) {
-                // Если ПК не настроен, предлагаем настроить
-                if (confirm('Для начала сессии нужно подключиться к Holostim ПК. Настроить сейчас?')) {
-                    configurePC();
-                }
-                return;
-            }
             
-            // Переходим на страницу сканирования
-            window.location.href = 'battle.html';
+            if (!pcIP) {
+                // Если IP не настроен, показываем диалог ввода
+                const ip = prompt('Введите IP-адрес компьютера с Holostim (например 10.114.65.155):', '10.114.65.155');
+                
+                if (ip) {
+                    // Проверка формата IP
+                    const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+                    if (ipPattern.test(ip)) {
+                        localStorage.setItem('holostim_pc_ip', ip);
+                        window.location.href = 'battle.html';
+                    } else {
+                        alert('❌ Неверный формат IP. Используйте формат: 192.168.1.100');
+                    }
+                }
+            } else {
+                window.location.href = 'battle.html';
+            }
         }
         
-        // Функция настройки подключения к ПК
+        // Функция настройки подключения к ПК (через кнопку ⚙️)
         window.configurePC = function() {
-            const currentIP = localStorage.getItem('holostim_pc_ip') || '192.168.1.100';
+            const currentIP = localStorage.getItem('holostim_pc_ip') || '10.114.65.155';
             const ip = prompt('Введите IP-адрес компьютера с Holostim:', currentIP);
             
             if (ip) {
-                // Простая валидация IP
                 const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
                 if (ipPattern.test(ip)) {
                     localStorage.setItem('holostim_pc_ip', ip);
-                    alert('✅ IP сохранен! Статус подключения обновится автоматически.');
+                    alert('✅ IP сохранен!');
                     checkPCConnection();
                 } else {
-                    alert('❌ Неверный формат IP. Используйте формат: 192.168.1.100');
+                    alert('❌ Неверный формат IP');
                 }
             }
         };
@@ -260,15 +266,14 @@
             const statusText = document.getElementById('pcStatusText');
             
             if (!pcIP) {
-                statusDot.className = 'pc-status-dot';
-                statusText.innerText = 'ПК не настроен';
+                if (statusDot) statusDot.className = 'pc-status-dot';
+                if (statusText) statusText.innerText = 'ПК не настроен';
                 return;
             }
             
             try {
-                // Пробуем подключиться к ПК
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2000); // Таймаут 2 секунды
+                const timeoutId = setTimeout(() => controller.abort(), 2000);
                 
                 const response = await fetch(`http://${pcIP}:8000/api/session/current`, {
                     signal: controller.signal
@@ -277,25 +282,22 @@
                 clearTimeout(timeoutId);
                 
                 if (response.ok) {
-                    statusDot.className = 'pc-status-dot connected';
-                    statusText.innerText = `Подключено к ${pcIP}`;
+                    if (statusDot) statusDot.className = 'pc-status-dot connected';
+                    if (statusText) statusText.innerText = `Подключено к ${pcIP}`;
                 } else {
                     throw new Error('Сервер недоступен');
                 }
             } catch (error) {
-                statusDot.className = 'pc-status-dot searching';
-                statusText.innerText = `Поиск Holostim ПК...`;
-                console.log('Не удалось подключиться к ПК:', error);
+                if (statusDot) statusDot.className = 'pc-status-dot searching';
+                if (statusText) statusText.innerText = `Поиск Holostim ПК...`;
             }
         }
         
-        // Проверяем подключение при загрузке страницы
+        // Проверяем подключение при загрузке и каждые 10 секунд
         checkPCConnection();
-        
-        // Проверяем подключение каждые 10 секунд
         setInterval(checkPCConnection, 10000);
         
-        // Загружаем место в рейтинге из localStorage
+        // Загружаем место в рейтинге
         const playerRank = localStorage.getItem('player_rating_position');
         if (playerRank) {
             document.getElementById('playerRank').innerText = '#' + playerRank;
@@ -311,7 +313,6 @@
                 const data = await response.json();
                 
                 if (!data.error && data.player_name) {
-                    // Если есть активная сессия, показываем уведомление
                     if (data.started) {
                         const notification = document.createElement('div');
                         notification.style.cssText = `
@@ -330,16 +331,14 @@
                         `;
                         notification.innerText = `🎯 Активная сессия: ${data.player_name} (${data.shots} выстрелов)`;
                         document.body.appendChild(notification);
-                        
                         setTimeout(() => notification.remove(), 5000);
                     }
                 }
             } catch (error) {
-                // Игнорируем ошибки - просто нет подключения
+                // Игнорируем ошибки
             }
         }
         
-        // Загружаем статистику при открытии
         loadPCStats();
         
     </script>
