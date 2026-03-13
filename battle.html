@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Holostim — В бой</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #050810;
+            color: white;
+            font-family: system-ui;
+            overflow: hidden;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #scanner {
+            flex: 1;
+            width: 100%;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #scan-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border: 3px solid #ffcc33;
+            border-radius: 20px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        
+        .status {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .status-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .status-detail {
+            font-size: 14px;
+            color: #9aa3b5;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            text-decoration: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #ffcc33;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success {
+            color: #4CAF50;
+        }
+        
+        .error {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <a href="account.html" class="back-btn">←</a>
+    
+    <div id="container">
+        <div id="scanner">
+            <video id="video" playsinline autoplay></video>
+            <div id="scan-frame"></div>
+        </div>
+        
+        <div class="status">
+            <div class="status-text" id="statusMessage">
+                Наведи камеру на QR-код
+            </div>
+            <div class="status-detail" id="statusDetail">
+                на экране Holostim ПК
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script>
+        // Получаем данные игрока
+        const player = JSON.parse(localStorage.getItem('holostim_player'));
+        if (!player) {
+            window.location.href = 'index.html';
+        }
+        
+        // Элементы интерфейса
+        const video = document.getElementById('video');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusDetail = document.getElementById('statusDetail');
+        
+        // Переменные для сканирования
+        let scanning = true;
+        let canvasElement = document.createElement('canvas');
+        let canvasContext = canvasElement.getContext('2d');
+        
+        // Запуск камеры
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' } // Задняя камера
+                });
+                video.srcObject = stream;
+                
+                video.addEventListener('play', () => {
+                    canvasElement.width = video.videoWidth;
+                    canvasElement.height = video.videoHeight;
+                    requestAnimationFrame(scanQR);
+                });
+            } catch (error) {
+                statusMessage.innerHTML = '❌ Ошибка доступа к камере';
+                statusDetail.innerHTML = 'Проверь разрешения';
+                console.error(error);
+            }
+        }
+        
+        // Сканирование QR-кода
+        async function scanQR() {
+            if (!scanning) return;
+            
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvasContext.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                const imageData = canvasContext.getImageData(
+                    0, 0, canvasElement.width, canvasElement.height
+                );
+                
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert'
+                });
+                
+                if (code) {
+                    // Проверяем, что это наш QR
+                    if (code.data.startsWith('holostim://connect')) {
+                        const url = new URL(code.data);
+                        const sessionId = url.searchParams.get('session');
+                        
+                        statusMessage.innerHTML = '✅ QR найден! Подключаемся...';
+                        statusDetail.innerHTML = 'Сессия: ' + sessionId;
+                        
+                        // Отправляем данные на ПК
+                        try {
+                            // Определяем IP ПК с Holostim (можно сохранять в настройках)
+                            const pcIP = localStorage.getItem('holostim_pc_ip') || '192.168.1.100';
+                            
+                            const response = await fetch(`http://${pcIP}:8000/api/connect`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    session_id: sessionId,
+                                    player_id: player.id || Date.now().toString(),
+                                    player_name: player.nickname
+                                })
+                            });
+                            
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                statusMessage.innerHTML = '✅ Подключено!';
+                                statusDetail.innerHTML = 'Сессия запущена';
+                                
+                                // Переходим на экран сессии через 2 секунды
+                                setTimeout(() => {
+                                    window.location.href = 'session.html?session=' + sessionId;
+                                }, 2000);
+                            } else {
+                                throw new Error('Ошибка подключения');
+                            }
+                        } catch (error) {
+                            statusMessage.innerHTML = '❌ Ошибка подключения к ПК';
+                            statusDetail.innerHTML = 'Проверь, включен ли Holostim';
+                            console.error(error);
+                            
+                            // Продолжаем сканирование
+                            setTimeout(() => {
+                                statusMessage.innerHTML = 'Наведи камеру на QR-код';
+                                statusDetail.innerHTML = 'на экране Holostim ПК';
+                                requestAnimationFrame(scanQR);
+                            }, 3000);
+                            return;
+                        }
+                        
+                        scanning = false;
+                        return;
+                    }
+                }
+            }
+            
+            requestAnimationFrame(scanQR);
+        }
+        
+        // Добавляем поле для ввода IP ПК (можно в настройках)
+        function showPCSettings() {
+            const ip = prompt('Введите IP-адрес компьютера с Holostim:', 
+                             localStorage.getItem('holostim_pc_ip') || '192.168.1.100');
+            if (ip) {
+                localStorage.setItem('holostim_pc_ip', ip);
+                statusDetail.innerHTML = `ПК: ${ip}`;
+            }
+        }
+        
+        // Кнопка настроек (можно добавить в интерфейс)
+        // showPCSettings();
+        
+        // Запускаем камеру
+        startCamera();
+    </script>
+</body>
+</html>

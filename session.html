@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Holostim — Сессия</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #050810;
+            color: white;
+            font-family: system-ui;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .session-header {
+            background: linear-gradient(90deg, #ffcc33, #ff9f43);
+            padding: 20px;
+            color: #000;
+            font-weight: bold;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .stats-container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-title {
+            font-size: 14px;
+            color: #9aa3b5;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .stat-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffcc33;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffcc33, #ff9f43);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .exit-btn {
+            margin: 20px;
+            padding: 16px;
+            border-radius: 999px;
+            border: none;
+            background: #f44336;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="session-header">
+        🎯 СЕССИЯ
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-title">ВЫСТРЕЛЫ</div>
+            <div class="stat-value" id="shots">0</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-title">ПОПАДАНИЯ</div>
+            <div class="stat-value" id="hits">0</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-title">ТОЧНОСТЬ</div>
+            <div class="stat-value" id="accuracy">0%</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-title">ОПЫТ ЗА СЕССИЮ</div>
+            <div class="stat-value" id="xp">0</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="stat-row">
+            <span>Игрок:</span>
+            <span id="playerName">Загрузка...</span>
+        </div>
+        <div class="stat-row">
+            <span>Сессия:</span>
+            <span id="sessionId">...</span>
+        </div>
+    </div>
+    
+    <button class="exit-btn" onclick="endSession()">ЗАВЕРШИТЬ СЕССИЮ</button>
+    
+    <script>
+        // Получаем ID сессии из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        
+        const player = JSON.parse(localStorage.getItem('holostim_player'));
+        const pcIP = localStorage.getItem('holostim_pc_ip') || '192.168.1.100';
+        
+        document.getElementById('sessionId').innerText = sessionId;
+        document.getElementById('playerName').innerText = player.nickname;
+        
+        // Обновление статистики
+        async function updateStats() {
+            try {
+                const response = await fetch(`http://${pcIP}:8000/api/session/current`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('shots').innerText = '0';
+                    document.getElementById('hits').innerText = '0';
+                    document.getElementById('accuracy').innerText = '0%';
+                } else {
+                    document.getElementById('shots').innerText = data.shots || 0;
+                    document.getElementById('hits').innerText = data.hits || 0;
+                    
+                    const accuracy = data.shots > 0 
+                        ? Math.round(data.hits / data.shots * 100) 
+                        : 0;
+                    document.getElementById('accuracy').innerText = accuracy + '%';
+                    
+                    // Опыт (10 XP за попадание)
+                    const xp = (data.hits || 0) * 10;
+                    document.getElementById('xp').innerText = xp;
+                    
+                    // Прогресс до следующего звания (пример)
+                    const progress = (xp % 100) / 100 * 100;
+                    document.getElementById('progress').style.width = progress + '%';
+                }
+            } catch (error) {
+                console.log('Ошибка обновления статистики', error);
+            }
+        }
+        
+        // Обновляем каждые 2 секунды
+        setInterval(updateStats, 2000);
+        updateStats();
+        
+        // Завершение сессии
+        async function endSession() {
+            try {
+                const response = await fetch(`http://${pcIP}:8000/api/session/end`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.player_id) {
+                    // Обновляем профиль игрока
+                    let player = JSON.parse(localStorage.getItem('holostim_player'));
+                    player.xp = (player.xp || 0) + (result.xp_earned || 0);
+                    player.sessions = (player.sessions || 0) + 1;
+                    player.accuracy = result.accuracy || 0;
+                    localStorage.setItem('holostim_player', JSON.stringify(player));
+                    
+                    alert(`Сессия завершена!\n+${result.xp_earned} XP\nТочность: ${result.accuracy.toFixed(1)}%`);
+                }
+            } catch (error) {
+                console.log('Ошибка завершения сессии', error);
+            }
+            
+            window.location.href = 'account.html';
+        }
+    </script>
+</body>
+</html>
