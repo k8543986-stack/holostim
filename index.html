@@ -25,6 +25,45 @@
       padding: 0;
       overflow-x: hidden;
     }
+    
+    /* ===== СТИЛИ ДЛЯ ЧЕКБОКСА СОГЛАСИЯ ===== */
+    .consent {
+      color: white !important;  /* Белый текст */
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .consent:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .consent input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #ffcc33;  /* Золотой цвет для галочки */
+      margin: 0;
+    }
+    
+    /* Стили для ссылки на политику (если добавишь) */
+    .consent a {
+      color: #ffcc33;
+      text-decoration: none;
+      margin-left: 5px;
+    }
+    
+    .consent a:hover {
+      text-decoration: underline;
+    }
+    /* ===== КОНЕЦ СТИЛЕЙ ===== */
   </style>
 </head>
 <body>
@@ -85,124 +124,6 @@
       </button>
     </div>
 
-  </div>
-</div>
-
-<!-- ================= ГЛАВНЫЙ ЭКРАН ================= -->
-class="screen" style="display:none">
-  <!-- Фоновый элемент ТОЛЬКО для главного экрана -->
-  <div class="screen-main-bg" id="main-bg"></div>
-
-  <div class="main-container">
-    <header>
-      <div>
-        <div class="title">HOLOSTIM</div>
-        <div class="subtitle">Профиль стрелка · Личный склад</div>
-      </div>
-      <div class="balance" id="headerBalance">
-        Загрузка...
-      </div>
-    </header>
-
-    <nav class="top-tabs">
-      <button class="tab active" data-tab="sklad">Склад</button>
-      <button class="tab" data-tab="progress">Прогресс</button>
-      <button class="tab" data-tab="shop">Магазин</button>
-    </nav>
-
-    <main>
-      <!-- Вкладка СКЛАД -->
-      <section class="tab-content active" id="tab-sklad">
-        <div class="layout">
-          <section class="character-card">
-            <div class="character-header">
-              <div class="character-class">Стрелок Holostim</div>
-              <div class="character-level" id="charLevel">LVL 1 · Новичок</div>
-            </div>
-
-            <div class="character-body">
-              <div class="avatar-wrapper" id="avatar">
-                Фото
-              </div>
-              <label class="upload-avatar-btn">
-                <input type="file" accept="image/*" id="avatarInput">
-                <span>Загрузить фото</span>
-              </label>
-
-              <div class="character-silhouette">
-                Тут будет модель бойца
-              </div>
-            </div>
-
-            <div class="character-footer">
-              <div class="xp-bar-label">
-                <span>Прогресс</span>
-                <span id="xpLabel">0 / 100 XP</span>
-              </div>
-              <div class="xp-bar">
-                <div class="xp-bar-fill" id="xpFill" style="width:0%"></div>
-              </div>
-              <div class="character-actions">
-                <button class="btn-primary" onclick="startSession()">В БОЙ</button>
-                <button class="btn-ghost">Тарифы</button>
-              </div>
-            </div>
-          </section>
-
-          <section class="right-column">
-            <div class="panel">
-              <div class="panel-title">Режимы</div>
-              <div class="modes-grid">
-                <div class="mode-card">Стандарт</div>
-                <div class="mode-card">Реакция</div>
-                <div class="mode-card">Дуэль</div>
-                <div class="mode-card">Ночной</div>
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-title">Ачивки</div>
-              <div class="achievements-list">
-                <div class="ach-badge gold">⭐ Новобранец</div>
-                <div class="ach-badge silver">🎯 Меткий</div>
-                <div class="ach-badge bronze">🔥 Серия</div>
-              </div>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <section class="tab-content" id="tab-progress">
-        <div class="placeholder-card">
-          Здесь будет история сессий
-        </div>
-      </section>
-
-      <section class="tab-content" id="tab-shop">
-        <div class="placeholder-card">
-          Магазин и подписки
-        </div>
-      </section>
-      
-      <!-- DEV кнопка (видна только в разработке) -->
-      <button
-        id="dev-reset-btn"
-        onclick="resetAccount()"
-        style="
-          display: none;
-          margin: 24px auto 0;
-          padding: 8px 14px;
-          font-size: 12px;
-          opacity: 0.6;
-          border-radius: 999px;
-          border: 1px dashed rgba(255,255,255,0.4);
-          background: transparent;
-          color: #fff;
-          cursor: pointer;
-        ">
-        🔄 Сбросить аккаунт (DEV)
-      </button>
-    </main>
   </div>
 </div>
 
