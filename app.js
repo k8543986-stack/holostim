@@ -1,4 +1,4 @@
-// app.js — Holostim v2.0 (Telegram Integration + Smart ID)
+// app.js — Holostim v3.0 (Гарантированная видимость функций)
 
 const DEV_MODE = true;
 
@@ -14,98 +14,21 @@ let player = {
     league: 'Новичок',
     xp: 0,
     consent: false,
-    telegram_id: null,      // ID из Telegram (если есть)
-    created_at: null,       // Дата создания
-    last_login: null        // Последний вход
+    telegram_id: null,
+    created_at: null,
+    last_login: null
 };
 
-/* =======================
-   APP INIT
-======================= */
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Проверяем, есть ли уже сохранённый игрок
-    const savedPlayer = localStorage.getItem('holostim_player');
-    if (savedPlayer) {
-        // Если игрок уже есть — сразу в аккаунт
-        window.location.href = 'account.html';
-        return;
-    }
-    
-    // Иначе показываем онбординг
-    initOnboarding();
-    initDevTools();
-    
-    // Пытаемся получить данные из Telegram
-    loadTelegramData();
-});
-
-let onboardingStep = 1;
+// Сразу делаем player глобальным
+window.player = player;
 
 /* =======================
-   ЗАГРУЗКА ДАННЫХ ИЗ TELEGRAM
+   ОБЪЯВЛЕНИЕ ФУНКЦИЙ ДО ИХ ИСПОЛЬЗОВАНИЯ
 ======================= */
 
-function loadTelegramData() {
-    // Проверяем, запущено ли приложение внутри Telegram
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        // Расширяем на весь экран
-        tg.expand();
-        
-        // Получаем данные пользователя
-        const user = tg.initDataUnsafe?.user;
-        
-        if (user) {
-            console.log('✅ Авторизация через Telegram:', user);
-            
-            // Сохраняем Telegram ID
-            player.telegram_id = user.id;
-            
-            // Предзаполняем ник из Telegram (можно изменить потом)
-            player.nickname = user.first_name;
-            
-            // Если есть username, можно использовать его
-            if (user.username) {
-                player.username = user.username;
-            }
-            
-            // Показываем приветствие (опционально)
-            console.log(`👋 Привет, ${user.first_name}!`);
-            
-            // Можно отправить данные обратно в Telegram
-            tg.sendData(JSON.stringify({
-                action: 'init',
-                player_id: user.id,
-                nickname: user.first_name
-            }));
-        } else {
-            console.log('ℹ️ Приложение открыто вне Telegram или пользователь не авторизован');
-        }
-    } else {
-        console.log('ℹ️ Режим: PWA/браузер (Telegram SDK не загружен)');
-    }
-}
-
-/* =======================
-   ONBOARDING
-======================= */
-
-function initOnboarding() {
-    showStep(1);
-
-    const consentCheckbox = document.getElementById('consentCheckbox');
-    const finishBtn = document.getElementById('finishBtn');
-
-    if (consentCheckbox && finishBtn) {
-        consentCheckbox.addEventListener('change', () => {
-            finishBtn.disabled = !consentCheckbox.checked;
-        });
-    }
-}
-
+// Функции объявляем через function, чтобы они были видны до инициализации
 function showStep(step) {
+    console.log('📌 showStep вызван с шагом:', step);
     onboardingStep = step;
 
     document.querySelectorAll('.onboarding-step').forEach(el => {
@@ -126,27 +49,24 @@ function showStep(step) {
     });
 }
 
-/* =======================
-   GENDER
-======================= */
-
 function chooseGender(gender) {
-    console.log("Выбран пол:", gender);
-    player.gender = gender;
+    console.log("🔥 chooseGender вызван с полом:", gender);
+    if (player) {
+        player.gender = gender;
+        console.log("✅ Пол сохранён в player:", player.gender);
+    } else {
+        console.error("❌ player не определён");
+    }
     showStep(2);
 }
 
-/* =======================
-   NICKNAME
-======================= */
-
 function saveNickname() {
+    console.log("🔥 saveNickname вызван");
     const input = document.getElementById('nicknameInput');
     
-    // Если поле пустое, но есть ник из Telegram — используем его
     if (!input || !input.value.trim()) {
         if (player.nickname) {
-            // Уже есть ник из Telegram
+            console.log("✅ Используем ник из Telegram:", player.nickname);
             showStep(3);
             return;
         } else {
@@ -155,56 +75,37 @@ function saveNickname() {
         }
     }
 
-    // Сохраняем введённый ник (перезаписывает Telegram ник)
     player.nickname = input.value.trim();
+    console.log("✅ Ник сохранён:", player.nickname);
     showStep(3);
 }
 
-/* =======================
-   ГЕНЕРАЦИЯ УНИКАЛЬНОГО ID
-======================= */
-
-function generatePlayerId() {
-    // Если есть Telegram ID — используем его как основной
+function finishRegistration() {
+    console.log("🔥 finishRegistration вызван");
+    
+    // Генерируем уникальный ID
     if (player.telegram_id) {
-        return `tg_${player.telegram_id}`;
+        player.id = `tg_${player.telegram_id}`;
+    } else {
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+        player.id = `pwa_${timestamp}_${random}`;
     }
     
-    // Если нет Telegram ID — генерируем свой
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `pwa_${timestamp}_${random}`;
-}
-
-/* =======================
-   FINISH
-======================= */
-
-function finishRegistration() {
-    // Генерируем уникальный ID
-    player.id = generatePlayerId();
-    
-    // Если ник не задан, ставим значение по умолчанию
     if (!player.nickname) {
         player.nickname = 'Стрелок';
     }
     
-    // Добавляем временные метки
     player.created_at = Date.now();
     player.last_login = Date.now();
-    
-    // Начальные значения
     player.level = 1;
     player.league = 'Новичок';
     player.xp = 0;
     player.consent = true;
     
-    // Сохраняем в localStorage
     localStorage.setItem('holostim_player', JSON.stringify(player));
-    
     console.log('✅ Аккаунт создан:', player);
     
-    // Если есть Telegram — уведомляем
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.sendData(JSON.stringify({
             action: 'register',
@@ -213,18 +114,51 @@ function finishRegistration() {
         }));
     }
     
-    // Переход в аккаунт
     window.location.href = 'account.html';
 }
-
-/* =======================
-   DEV
-======================= */
 
 function resetAccount() {
     if (confirm('Сбросить аккаунт? Весь прогресс будет потерян.')) {
         localStorage.removeItem('holostim_player');
         location.reload();
+    }
+}
+
+function loadTelegramData() {
+    console.log("📡 Загрузка данных из Telegram...");
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const user = tg.initDataUnsafe?.user;
+        
+        if (user) {
+            console.log('✅ Авторизация через Telegram:', user);
+            player.telegram_id = user.id;
+            player.nickname = user.first_name;
+            
+            if (user.username) {
+                player.username = user.username;
+            }
+        } else {
+            console.log('ℹ️ Пользователь не авторизован в Telegram');
+        }
+    } else {
+        console.log('ℹ️ Режим: PWA/браузер');
+    }
+}
+
+function initOnboarding() {
+    console.log("🚀 Инициализация онбординга");
+    showStep(1);
+
+    const consentCheckbox = document.getElementById('consentCheckbox');
+    const finishBtn = document.getElementById('finishBtn');
+
+    if (consentCheckbox && finishBtn) {
+        consentCheckbox.addEventListener('change', () => {
+            finishBtn.disabled = !consentCheckbox.checked;
+        });
     }
 }
 
@@ -238,18 +172,50 @@ function initDevTools() {
 }
 
 /* =======================
-   ЭКСПОРТ ФУНКЦИЙ
+   APP INIT
 ======================= */
 
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("📱 DOM загружен, начинаем инициализацию...");
+    
+    const savedPlayer = localStorage.getItem('holostim_player');
+    if (savedPlayer) {
+        console.log("👤 Найден сохранённый игрок, редирект в account.html");
+        window.location.href = 'account.html';
+        return;
+    }
+    
+    initOnboarding();
+    initDevTools();
+    loadTelegramData();
+});
+
+let onboardingStep = 1;
+
+/* =======================
+   ГЛОБАЛЬНЫЙ ЭКСПОРТ (ГАРАНТИРОВАННЫЙ)
+======================= */
+
+// Принудительно записываем все функции в window
 window.chooseGender = chooseGender;
 window.saveNickname = saveNickname;
 window.finishRegistration = finishRegistration;
 window.resetAccount = resetAccount;
 window.showStep = showStep;
-window.player = player; // для отладки (можно удалить в проде)
-console.log('✅ app.js загружен');
-console.log('📋 Доступные функции:', {
+window.loadTelegramData = loadTelegramData;
+window.initOnboarding = initOnboarding;
+window.player = player;
+
+// Дублируем самые важные функции для надёжности
+window.chooseGender = window.chooseGender || chooseGender;
+window.saveNickname = window.saveNickname || saveNickname;
+window.finishRegistration = window.finishRegistration || finishRegistration;
+
+console.log('✅ app.js загружен и инициализирован');
+console.log('📋 Проверка глобальных функций:', {
     chooseGender: typeof window.chooseGender,
     saveNickname: typeof window.saveNickname,
-    finishRegistration: typeof window.finishRegistration
+    finishRegistration: typeof window.finishRegistration,
+    showStep: typeof window.showStep
 });
+console.log('👤 window.player:', window.player);
