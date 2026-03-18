@@ -247,3 +247,9 @@ window.finishRegistration = finishRegistration;
 window.resetAccount = resetAccount;
 window.showStep = showStep;
 window.player = player; // для отладки (можно удалить в проде)
+console.log('✅ app.js загружен');
+console.log('📋 Доступные функции:', {
+    chooseGender: typeof window.chooseGender,
+    saveNickname: typeof window.saveNickname,
+    finishRegistration: typeof window.finishRegistration
+});
