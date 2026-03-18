@@ -213,69 +213,13 @@
 
         // Функция начала боя - переход на сканирование QR
         function startBattle() {
-            // Просто показываем QR на весь экран
             window.location.href = 'show-qr.html';
         }
 
-        // Функция настройки подключения к ПК (через кнопку ⚙️)
-        window.configurePC = function () {
-            const currentIP = localStorage.getItem('holostim_pc_ip') || '10.114.65.155';
-            const ip = prompt('Введите IP-адрес компьютера с Holostim:', currentIP);
-
-            if (ip) {
-                const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-                if (ipPattern.test(ip)) {
-                    localStorage.setItem('holostim_pc_ip', ip);
-                    alert('✅ IP сохранен!');
-                    checkPCConnection();
-                } else {
-                    alert('❌ Неверный формат IP');
-                }
-            }
-        };
-
-        // Функция проверки подключения к ПК
-        async function checkPCConnection() {
-            const pcIP = localStorage.getItem('holostim_pc_ip');
-            const statusDot = document.getElementById('pcStatusDot');
-            const statusText = document.getElementById('pcStatusText');
-
-            if (!pcIP) {
-                if (statusDot) statusDot.className = 'pc-status-dot';
-                if (statusText) statusText.innerText = 'ПК не настроен';
-                return;
-            }
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2000);
-
-                const response = await fetch(`http://${pcIP}:8000/api/session/current`, {
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    if (statusDot) statusDot.className = 'pc-status-dot connected';
-                    if (statusText) statusText.innerText = `Подключено к ${pcIP}`;
-                } else {
-                    throw new Error('Сервер недоступен');
-                }
-            } catch (error) {
-                if (statusDot) statusDot.className = 'pc-status-dot searching';
-                if (statusText) statusText.innerText = `Поиск Holostim ПК...`;
-            }
-        }
-
-        // Проверяем подключение при загрузке и каждые 10 секунд
-        checkPCConnection();
-        setInterval(checkPCConnection, 10000);
-
-        // Загружаем место в рейтинге
-        const playerRank = localStorage.getItem('player_rating_position');
-        if (playerRank) {
-            document.getElementById('playerRank').innerText = '#' + playerRank;
+        // Загружаем место в рейтинге (используем другую переменную)
+        const savedPlayerRank = localStorage.getItem('player_rating_position');
+        if (savedPlayerRank) {
+            document.getElementById('playerRank').innerText = '#' + savedPlayerRank;
         }
 
         // Загружаем статистику с ПК если есть подключение
