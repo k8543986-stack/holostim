@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Holostim — Ваш QR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #050810;
+            color: white;
+            font-family: system-ui;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px;
+            box-shadow: 0 0 30px rgba(255,204,51,0.3);
+        }
+        
+        #qr-code {
+            width: 250px;
+            height: 250px;
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .status-text {
+            font-size: 18px;
+            color: #ffcc33;
+            margin-bottom: 10px;
+        }
+        
+        .status-detail {
+            font-size: 14px;
+            color: #9aa3b5;
+        }
+        
+        .instruction {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            max-width: 300px;
+        }
+        
+        .instruction-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #ffcc33;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .connected {
+            display: none;
+            text-align: center;
+        }
+        
+        .connected.active {
+            display: block;
+        }
+        
+        .connected .checkmark {
+            font-size: 80px;
+            color: #4CAF50;
+            animation: pop 0.5s;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+    <!-- Библиотека для генерации QR -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+</head>
+<body>
+    <a href="account.html" class="back-btn">←</a>
+    
+    <div id="qr-screen" class="qr-screen">
+        <div class="qr-container">
+            <div id="qr-code"></div>
+        </div>
+        
+        <div class="status">
+            <div class="status-text">🎯 Ожидание сканирования</div>
+            <div class="status-detail">Направьте телефон на камеру 1</div>
+        </div>
+        
+        <div class="instruction">
+            <div class="instruction-step">
+                <span class="step-number">1</span>
+                <span>Держите телефон экраном к камере</span>
+            </div>
+            <div class="instruction-step">
+                <span class="step-number">2</span>
+                <span>Камера на стрелка отсканирует QR</span>
+            </div>
+            <div class="instruction-step">
+                <span class="step-number">3</span>
+                <span>QR закроется автоматически</span>
+            </div>
+        </div>
+    </div>
+    
+    <div id="connected-screen" class="connected">
+        <div class="checkmark">✅</div>
+        <div style="font-size: 24px; margin: 20px 0;">Подключено!</div>
+        <div style="color: #9aa3b5;">Сессия запущена</div>
+    </div>
+    
+    <script>
+        // Получаем данные игрока
+        const player = JSON.parse(localStorage.getItem('holostim_player'));
+        if (!player) {
+            window.location.href = 'index.html';
+        }
+        
+        // Генерируем уникальный ID сессии
+        const sessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
+        
+        // Данные для QR (ID игрока + сессия)
+        const qrData = JSON.stringify({
+            player_id: player.id || Date.now().toString(),
+            player_name: player.nickname,
+            session_id: sessionId,
+            timestamp: Date.now()
+        });
+        
+        // Показываем QR на экране
+        QRCode.toCanvas(document.getElementById('qr-code'), qrData, {
+            width: 250,
+            margin: 2,
+            color: {
+                dark: '#000000',
+                light: '#ffffff'
+            }
+        }, function(error) {
+            if (error) console.error(error);
+        });
+        
+        // Функция для проверки, отсканирован ли QR
+        function checkIfScanned() {
+            // Здесь можно подключиться к серверу Holostim
+            // или использовать WebSocket, но пока для демо:
+            if (localStorage.getItem('qr_scanned_' + sessionId)) {
+                onScanned();
+            }
+        }
+        
+        // Когда QR отсканирован
+        function onScanned() {
+            document.getElementById('qr-screen').style.display = 'none';
+            document.getElementById('connected-screen').classList.add('active');
+            
+            // Через 2 секунды переходим на страницу сессии
+            setTimeout(() => {
+                window.location.href = 'session.html?session=' + sessionId;
+            }, 2000);
+        }
+        
+        // Проверяем каждые 2 секунды (временное решение)
+        setInterval(checkIfScanned, 2000);
+    </script>
+</body>
+</html>
