@@ -29,9 +29,10 @@
             align-items: center;
         }
         
-        #qrcode {
+        #qr-image {
             width: 250px;
             height: 250px;
+            image-rendering: pixelated;
         }
         
         .status {
@@ -123,16 +124,22 @@
             color: #ffcc33;
             padding: 20px;
         }
+        
+        /* Стиль для ID сессии */
+        .session-id {
+            font-size: 12px;
+            color: #9aa3b5;
+            margin-top: 10px;
+            text-align: center;
+        }
     </style>
-    <!-- Используем другую библиотеку QRCode (более надёжную) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <a href="account.html" class="back-btn">←</a>
     
     <div id="qr-screen" class="qr-screen">
         <div class="qr-container">
-            <div id="qrcode"></div>
+            <img id="qr-image" src="" alt="QR код">
             <div id="qr-loading" class="qr-loading">Генерация QR кода...</div>
         </div>
         
@@ -140,6 +147,8 @@
             <div class="status-text">🎯 Ожидание сканирования</div>
             <div class="status-detail">Направьте телефон на камеру ПК</div>
         </div>
+        
+        <div class="session-id" id="session-id"></div>
         
         <div class="instruction">
             <div class="instruction-step">
@@ -172,94 +181,92 @@
         
         // Генерируем уникальный ID сессии
         const sessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
+        document.getElementById('session-id').innerText = 'Сессия: ' + sessionId;
         
-        // Данные для QR (ID игрока + сессия) - делаем простую строку, не JSON
+        // Данные для QR (ID игрока + сессия)
         const playerId = player.id || Date.now().toString();
         const playerName = player.nickname || 'Стрелок';
         
-        // Формируем данные для QR - простая строка с параметрами
+        // Формируем данные для QR - простая строка
         const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}&session=${sessionId}&t=${Date.now()}`;
         
         console.log('📱 Данные для QR:', qrData);
         
-        // Функция для создания QR кода
+        // Функция для создания QR через Google Charts API
         function generateQR() {
-            const qrContainer = document.getElementById('qrcode');
+            const qrImage = document.getElementById('qr-image');
             const loadingEl = document.getElementById('qr-loading');
             
-            // Очищаем контейнер
-            qrContainer.innerHTML = '';
+            // Кодируем данные для URL
+            const encodedData = encodeURIComponent(qrData);
             
-            try {
-                // Создаём QR код с помощью библиотеки
-                new QRCode(qrContainer, {
-                    text: qrData,
-                    width: 250,
-                    height: 250,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
+            // Используем Google Charts API для генерации QR
+            // Это самый надёжный способ - не требует библиотек
+            qrImage.src = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodedData}&choe=UTF-8`;
+            
+            // Показываем изображение когда оно загрузится
+            qrImage.onload = function() {
+                console.log('✅ QR код успешно загружен через Google API');
+                loadingEl.style.display = 'none';
+                qrImage.style.display = 'block';
+            };
+            
+            qrImage.onerror = function() {
+                console.error('❌ Ошибка загрузки QR через Google API');
+                loadingEl.innerHTML = '❌ Ошибка загрузки QR кода';
+                loadingEl.style.color = '#ff4444';
                 
-                // Скрываем индикатор загрузки
-                if (loadingEl) {
-                    loadingEl.style.display = 'none';
-                }
-                
-                console.log('✅ QR код успешно создан');
-            } catch (error) {
-                console.error('❌ Ошибка создания QR:', error);
-                
-                // Показываем ошибку
-                if (loadingEl) {
-                    loadingEl.innerHTML = '❌ Ошибка создания QR кода';
-                    loadingEl.style.color = '#ff4444';
-                }
-                
-                // Запасной вариант - создаём canvas вручную
-                createFallbackQR();
-            }
+                // Показываем данные текстом как запасной вариант
+                showFallbackQR();
+            };
+            
+            // Показываем загрузку
+            loadingEl.style.display = 'block';
+            qrImage.style.display = 'none';
         }
         
-        // Запасной вариант создания QR
-        function createFallbackQR() {
-            const qrContainer = document.getElementById('qrcode');
+        // Запасной вариант - показываем данные текстом
+        function showFallbackQR() {
+            const qrContainer = document.querySelector('.qr-container');
             const loadingEl = document.getElementById('qr-loading');
-            
-            // Показываем текст вместо QR
-            qrContainer.innerHTML = `
-                <div style="
-                    width: 250px;
-                    height: 250px;
-                    background: white;
-                    border-radius: 10px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 10px;
-                    text-align: center;
-                    color: #000;
-                ">
-                    <div style="font-size: 40px; margin-bottom: 10px;">🎯</div>
-                    <div style="font-weight: bold; margin-bottom: 5px;">ID: ${playerId}</div>
-                    <div style="font-size: 12px;">Сессия: ${sessionId}</div>
-                    <div style="font-size: 12px; margin-top: 10px; color: #666;">Обновите страницу</div>
-                </div>
-            `;
             
             if (loadingEl) {
                 loadingEl.style.display = 'none';
             }
+            
+            // Создаём текстовое представление
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.style.cssText = `
+                width: 250px;
+                height: 250px;
+                background: white;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 15px;
+                text-align: center;
+                color: #000;
+            `;
+            
+            fallbackDiv.innerHTML = `
+                <div style="font-size: 40px; margin-bottom: 10px;">📱</div>
+                <div style="font-weight: bold; margin-bottom: 5px;">ID: ${playerId}</div>
+                <div style="margin-bottom: 5px;">Игрок: ${playerName}</div>
+                <div style="font-size: 12px; margin-bottom: 5px;">Сессия: ${sessionId}</div>
+                <div style="font-size: 11px; margin-top: 10px; color: #666;">Нажмите кнопку "В БОЙ" снова</div>
+            `;
+            
+            // Добавляем на страницу
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(fallbackDiv);
         }
         
         // Функция для проверки, отсканирован ли QR
         function checkIfScanned() {
-            // Здесь можно подключиться к серверу Holostim
-            // или использовать WebSocket, но пока для демо:
-            if (localStorage.getItem('qr_scanned_' + sessionId)) {
-                onScanned();
-            }
+            // TODO: Здесь будет реальная проверка через сервер
+            // Пока просто для демо
         }
         
         // Когда QR отсканирован
@@ -275,12 +282,15 @@
         
         // Запускаем генерацию QR после загрузки страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Небольшая задержка для гарантии
-            setTimeout(generateQR, 100);
+            generateQR();
         });
         
-        // Проверяем каждые 2 секунды (временное решение)
-        setInterval(checkIfScanned, 2000);
+        // Для теста - можно заменить на реальную проверку
+        // Сейчас просто показываем что сессия создана
+        setTimeout(() => {
+            console.log('⏱️ Сессия создана, ожидание сканирования...');
+        }, 1000);
+        
     </script>
 </body>
 </html>
