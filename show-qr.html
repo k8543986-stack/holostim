@@ -24,9 +24,12 @@
             border-radius: 20px;
             margin: 20px;
             box-shadow: 0 0 30px rgba(255,204,51,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
-        #qr-code {
+        #qrcode {
             width: 250px;
             height: 250px;
         }
@@ -90,6 +93,7 @@
             justify-content: center;
             cursor: pointer;
             text-decoration: none;
+            z-index: 100;
         }
         
         .connected {
@@ -112,21 +116,29 @@
             80% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
+        
+        /* Индикатор загрузки */
+        .qr-loading {
+            text-align: center;
+            color: #ffcc33;
+            padding: 20px;
+        }
     </style>
-    <!-- Библиотека для генерации QR -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <!-- Используем другую библиотеку QRCode (более надёжную) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <a href="account.html" class="back-btn">←</a>
     
     <div id="qr-screen" class="qr-screen">
         <div class="qr-container">
-            <div id="qr-code"></div>
+            <div id="qrcode"></div>
+            <div id="qr-loading" class="qr-loading">Генерация QR кода...</div>
         </div>
         
         <div class="status">
             <div class="status-text">🎯 Ожидание сканирования</div>
-            <div class="status-detail">Направьте телефон на камеру 1</div>
+            <div class="status-detail">Направьте телефон на камеру ПК</div>
         </div>
         
         <div class="instruction">
@@ -161,25 +173,85 @@
         // Генерируем уникальный ID сессии
         const sessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
         
-        // Данные для QR (ID игрока + сессия)
-        const qrData = JSON.stringify({
-            player_id: player.id || Date.now().toString(),
-            player_name: player.nickname,
-            session_id: sessionId,
-            timestamp: Date.now()
-        });
+        // Данные для QR (ID игрока + сессия) - делаем простую строку, не JSON
+        const playerId = player.id || Date.now().toString();
+        const playerName = player.nickname || 'Стрелок';
         
-        // Показываем QR на экране
-        QRCode.toCanvas(document.getElementById('qr-code'), qrData, {
-            width: 250,
-            margin: 2,
-            color: {
-                dark: '#000000',
-                light: '#ffffff'
+        // Формируем данные для QR - простая строка с параметрами
+        const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}&session=${sessionId}&t=${Date.now()}`;
+        
+        console.log('📱 Данные для QR:', qrData);
+        
+        // Функция для создания QR кода
+        function generateQR() {
+            const qrContainer = document.getElementById('qrcode');
+            const loadingEl = document.getElementById('qr-loading');
+            
+            // Очищаем контейнер
+            qrContainer.innerHTML = '';
+            
+            try {
+                // Создаём QR код с помощью библиотеки
+                new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 250,
+                    height: 250,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Скрываем индикатор загрузки
+                if (loadingEl) {
+                    loadingEl.style.display = 'none';
+                }
+                
+                console.log('✅ QR код успешно создан');
+            } catch (error) {
+                console.error('❌ Ошибка создания QR:', error);
+                
+                // Показываем ошибку
+                if (loadingEl) {
+                    loadingEl.innerHTML = '❌ Ошибка создания QR кода';
+                    loadingEl.style.color = '#ff4444';
+                }
+                
+                // Запасной вариант - создаём canvas вручную
+                createFallbackQR();
             }
-        }, function(error) {
-            if (error) console.error(error);
-        });
+        }
+        
+        // Запасной вариант создания QR
+        function createFallbackQR() {
+            const qrContainer = document.getElementById('qrcode');
+            const loadingEl = document.getElementById('qr-loading');
+            
+            // Показываем текст вместо QR
+            qrContainer.innerHTML = `
+                <div style="
+                    width: 250px;
+                    height: 250px;
+                    background: white;
+                    border-radius: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 10px;
+                    text-align: center;
+                    color: #000;
+                ">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🎯</div>
+                    <div style="font-weight: bold; margin-bottom: 5px;">ID: ${playerId}</div>
+                    <div style="font-size: 12px;">Сессия: ${sessionId}</div>
+                    <div style="font-size: 12px; margin-top: 10px; color: #666;">Обновите страницу</div>
+                </div>
+            `;
+            
+            if (loadingEl) {
+                loadingEl.style.display = 'none';
+            }
+        }
         
         // Функция для проверки, отсканирован ли QR
         function checkIfScanned() {
@@ -200,6 +272,12 @@
                 window.location.href = 'session.html?session=' + sessionId;
             }, 2000);
         }
+        
+        // Запускаем генерацию QR после загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Небольшая задержка для гарантии
+            setTimeout(generateQR, 100);
+        });
         
         // Проверяем каждые 2 секунды (временное решение)
         setInterval(checkIfScanned, 2000);
