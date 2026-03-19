@@ -5,10 +5,10 @@
   <title>Holostim — Mini App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   
-  <!-- Favicon - принудительно отключаем запрос favicon.ico -->
+  <!-- Favicon (эмодзи вместо файла) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
   <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
-  
+
   <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -120,88 +120,6 @@
 <script src="state.js"></script>
 <script src="ui.js"></script>
 <script src="app.js"></script>
-
-<!-- ================= ГАРАНТИРОВАННОЕ ПОЯВЛЕНИЕ КНОПКИ СБРОСА ================= -->
-<script>
-  (function() {
-    // Функция сброса (на случай если в app.js её нет)
-    if (typeof window.resetAccount !== 'function') {
-      window.resetAccount = function() {
-        if (confirm('🔄 Сбросить аккаунт? Весь прогресс будет потерян.')) {
-          localStorage.removeItem('holostim_player');
-          localStorage.removeItem('holostim_player_temp');
-          localStorage.removeItem('player_rating_position');
-          window.location.href = 'index.html';
-        }
-      };
-    }
-    
-    // Создаём кнопку сброса
-    function createResetButton() {
-      // Проверяем, может уже есть
-      let btn = document.getElementById('dev-reset-btn');
-      if (btn) {
-        btn.remove(); // Удаляем старую
-      }
-      
-      // Создаём новую
-      btn = document.createElement('button');
-      btn.id = 'dev-reset-btn';
-      btn.innerHTML = '🔴 СБРОС АККАУНТА';
-      btn.setAttribute('onclick', 'window.resetAccount(); return false;');
-      
-      // Стили - максимально заметные
-      btn.style.cssText = `
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 9999999 !important;
-        background: #ff3333 !important;
-        color: white !important;
-        border: 4px solid white !important;
-        border-radius: 60px !important;
-        padding: 16px 28px !important;
-        font-size: 18px !important;
-        font-weight: 900 !important;
-        cursor: pointer !important;
-        box-shadow: 0 0 30px rgba(255, 0, 0, 0.9) !important;
-        display: block !important;
-        width: auto !important;
-        height: auto !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        font-family: Arial, sans-serif !important;
-        line-height: normal !important;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.5) !important;
-      `;
-      
-      // Добавляем на страницу
-      document.body.appendChild(btn);
-      console.log('✅ Кнопка сброса создана и видна!');
-      
-      // Добавляем пульсацию
-      let pulse = 0;
-      setInterval(() => {
-        pulse = pulse === 0 ? 1 : 0;
-        btn.style.transform = pulse ? 'scale(1.1)' : 'scale(1)';
-        btn.style.transition = 'transform 0.5s';
-      }, 500);
-    }
-    
-    // Создаём кнопку когда страница загрузится
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', createResetButton);
-    } else {
-      createResetButton();
-    }
-    
-    // И ещё раз через секунду для надёжности
-    setTimeout(createResetButton, 1000);
-  })();
-</script>
 
 <!-- ================= ПРОСТЫЕ ОБРАБОТЧИКИ ================= -->
 <script>
