@@ -32,20 +32,6 @@
         #qrcode {
             width: 250px;
             height: 250px;
-            display: flex;
-            flex-wrap: wrap;
-        }
-        
-        .qr-cell {
-            box-sizing: border-box;
-        }
-        
-        .qr-cell.black {
-            background-color: #000000;
-        }
-        
-        .qr-cell.white {
-            background-color: #ffffff;
         }
         
         .status {
@@ -131,25 +117,29 @@
             100% { transform: scale(1); }
         }
         
-        /* Индикатор загрузки */
         .qr-loading {
             text-align: center;
             color: #ffcc33;
             padding: 20px;
         }
         
-        .session-id {
-            font-size: 12px;
-            color: #9aa3b5;
-            margin-top: 10px;
+        .player-info {
+            font-size: 16px;
+            color: #ffcc33;
+            margin-bottom: 15px;
             text-align: center;
+            font-weight: bold;
         }
     </style>
+    <!-- Подключаем библиотеку для генерации QR кодов -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
     <a href="account.html" class="back-btn">←</a>
     
     <div id="qr-screen" class="qr-screen">
+        <div class="player-info" id="player-info"></div>
+        
         <div class="qr-container">
             <div id="qrcode"></div>
             <div id="qr-loading" class="qr-loading">Генерация QR кода...</div>
@@ -159,8 +149,6 @@
             <div class="status-text">🎯 Ожидание сканирования</div>
             <div class="status-detail">Направьте телефон на камеру ПК</div>
         </div>
-        
-        <div class="session-id" id="session-id"></div>
         
         <div class="instruction">
             <div class="instruction-step">
@@ -191,124 +179,84 @@
             window.location.href = 'index.html';
         }
         
-        // Генерируем уникальный ID сессии
-        const sessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
-        document.getElementById('session-id').innerText = 'Сессия: ' + sessionId;
-        
-        // Данные для QR
+        // Данные игрока
         const playerId = player.id || Date.now().toString();
         const playerName = player.nickname || 'Стрелок';
         
-        // Формируем данные для QR
-        const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}&session=${sessionId}&t=${Date.now()}`;
+        // Показываем информацию об игроке
+        document.getElementById('player-info').innerHTML = `🎮 ${playerName}`;
         
-        console.log('📱 Данные для QR:', qrData);
+        // ФОРМИРУЕМ ПРАВИЛЬНЫЕ ДАННЫЕ ДЛЯ QR
+        // БЕЗ сессии - сессию создаёт Holostim ПК
+        const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}&timestamp=${Date.now()}`;
         
-        // ========== ПРОСТОЙ ГЕНЕРАТОР QR КОДА ==========
-        // Никаких библиотек, чистый JavaScript
+        console.log('📱 Данные для QR (без сессии):', qrData);
         
-        function generateQRCode(text, containerId, size = 250) {
+        // Функция для создания QR кода
+        function generateQRCode(text, containerId) {
             const container = document.getElementById(containerId);
             const loadingEl = document.getElementById('qr-loading');
             
             // Очищаем контейнер
             container.innerHTML = '';
             
-            // Простая реализация QR кода (для демо)
-            // В реальном проекте используйте библиотеку, но для простоты создаём паттерн
-            
-            const matrix = [
-                [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-                [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
-                [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
-                [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
-                [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-                [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,1,1,0,1,0,0,1,0,1,0,1,0,1,1,1,0,1,1,0,0,1],
-                [1,1,1,0,1,0,1,0,1,1,1,0,0,1,1,0,0,1,0,0,1,1,1],
-                [0,0,1,1,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
-                [1,1,0,0,0,1,0,0,1,1,1,0,0,0,0,1,0,0,1,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,1,1,0,1,0,0,1,0,1,1,1,0,0,1,1,1,1,0,1,0,1],
-                [1,1,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0],
-                [1,1,0,1,0,0,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,1,1,1,0,1,0,1],
-                [1,0,0,0,0,0,1,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0],
-                [1,0,1,1,1,0,1,0,1,0,0,1,0,1,1,0,1,0,0,1,0,0,0],
-                [1,0,1,1,1,0,1,0,0,1,0,1,1,0,0,0,1,1,1,0,0,1,1],
-                [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-                [1,1,1,1,1,1,1,0,1,1,1,0,1,0,0,1,0,0,0,1,0,0,1]
-            ];
-            
-            // Размер каждой ячейки
-            const cellSize = size / matrix.length;
-            
-            // Создаём ячейки
-            for (let row = 0; row < matrix.length; row++) {
-                for (let col = 0; col < matrix[row].length; col++) {
-                    const cell = document.createElement('div');
-                    cell.className = `qr-cell ${matrix[row][col] === 1 ? 'black' : 'white'}`;
-                    cell.style.width = cellSize + 'px';
-                    cell.style.height = cellSize + 'px';
-                    cell.style.position = 'absolute';
-                    cell.style.left = (col * cellSize) + 'px';
-                    cell.style.top = (row * cellSize) + 'px';
-                    container.appendChild(cell);
+            try {
+                // Создаём QR код с помощью библиотеки
+                const qr = qrcode(0, 'H');
+                qr.addData(text);
+                qr.make();
+                
+                // Получаем размер модуля
+                const moduleCount = qr.getModuleCount();
+                const cellSize = Math.floor(250 / moduleCount);
+                
+                // Создаём canvas для отрисовки
+                const canvas = document.createElement('canvas');
+                canvas.width = 250;
+                canvas.height = 250;
+                const ctx = canvas.getContext('2d');
+                
+                // Рисуем QR код
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        const isBlack = qr.isDark(row, col);
+                        ctx.fillStyle = isBlack ? '#000000' : '#ffffff';
+                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                    }
                 }
-            }
-            
-            // Устанавливаем размер контейнера и позиционирование
-            container.style.position = 'relative';
-            container.style.width = size + 'px';
-            container.style.height = size + 'px';
-            
-            // Скрываем загрузку
-            if (loadingEl) {
+                
+                // Добавляем canvas в контейнер
+                container.appendChild(canvas);
+                
+                // Скрываем загрузку
                 loadingEl.style.display = 'none';
+                
+                console.log('✅ QR код создан для игрока:', playerName);
+                console.log('📊 ID игрока:', playerId);
+                
+            } catch (error) {
+                console.error('❌ Ошибка создания QR:', error);
+                loadingEl.innerHTML = '❌ Ошибка создания QR кода';
+                loadingEl.style.color = '#ff4444';
             }
-            
-            // Добавляем текст с данными внизу (для отладки)
-            const debugDiv = document.createElement('div');
-            debugDiv.style.cssText = `
-                position: absolute;
-                bottom: -30px;
-                left: 0;
-                right: 0;
-                font-size: 8px;
-                color: #666;
-                text-align: center;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            `;
-            debugDiv.innerText = qrData.substring(0, 50) + '...';
-            container.appendChild(debugDiv);
-            
-            console.log('✅ QR код создан вручную');
         }
         
         // Запускаем генерацию QR после загрузки страницы
         document.addEventListener('DOMContentLoaded', function() {
-            generateQRCode(qrData, 'qrcode', 250);
+            setTimeout(() => {
+                generateQRCode(qrData, 'qrcode');
+            }, 100);
         });
         
-        // Функция для проверки, отсканирован ли QR
-        function checkIfScanned() {
-            // TODO: Здесь будет реальная проверка через сервер
+        // Функция для проверки подключения
+        function checkConnection() {
+            // TODO: Здесь будет проверка через сервер Holostim
+            // Когда Holostim ПК отсканирует QR и создаст сессию,
+            // он должен отправить подтверждение на телефон
         }
         
-        // Когда QR отсканирован
-        function onScanned() {
-            document.getElementById('qr-screen').style.display = 'none';
-            document.getElementById('connected-screen').classList.add('active');
-            
-            setTimeout(() => {
-                window.location.href = 'session.html?session=' + sessionId;
-            }, 2000);
-        }
+        // Проверяем подключение каждые 2 секунды
+        setInterval(checkConnection, 2000);
         
     </script>
 </body>
