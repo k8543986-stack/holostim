@@ -64,6 +64,67 @@
       text-decoration: underline;
     }
     /* ===== КОНЕЦ СТИЛЕЙ ===== */
+
+    /* ===== СТИЛИ ДЛЯ DEV КНОПКИ ===== */
+    .dev-reset-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: rgba(255, 0, 0, 0.9);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: none; /* Скрыта по умолчанию, будет показана через JS в DEV_MODE */
+    }
+
+    .dev-reset-btn:hover {
+      background: rgba(255, 0, 0, 1);
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+    }
+
+    .dev-reset-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Стили для мобильных устройств */
+    @media (max-width: 480px) {
+      .dev-reset-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        font-size: 12px;
+      }
+    }
+
+    /* Анимация пульсации для привлечения внимания (опционально) */
+    @keyframes devPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+      }
+    }
+
+    .dev-reset-btn.pulse {
+      animation: devPulse 2s infinite;
+    }
+    /* ===== КОНЕЦ СТИЛЕЙ DEV КНОПКИ ===== */
   </style>
 </head>
 <body>
@@ -85,14 +146,16 @@
       <p>Этот выбор определит твой фон</p>
 
       <div class="wick-gender-screen">
-        <img src="assets/img/johnwick_gender.jpg" class="wick-bg">
+        <img src="assets/img/johnwick_gender.jpg" class="wick-bg" alt="Выбор персонажа">
         <div class="wick-overlay"></div>
 
         <button class="wick-zone wick-male"
-                onclick="chooseGender('male')"></button>
+                onclick="chooseGender('male')"
+                aria-label="Выбрать мужского персонажа"></button>
 
         <button class="wick-zone wick-female"
-                onclick="chooseGender('female')"></button>
+                onclick="chooseGender('female')"
+                aria-label="Выбрать женского персонажа"></button>
 
         <div class="wick-label wick-label-male">МУЖЧИНА</div>
         <div class="wick-label wick-label-female">ДЕВУШКА</div>
@@ -104,7 +167,7 @@
       <h1>Как тебя называть?</h1>
       <p>Этот ник будут видеть в системе</p>
 
-      <input type="text" id="nicknameInput" placeholder="Введите ник">
+      <input type="text" id="nicknameInput" placeholder="Введите ник" maxlength="20">
       <button class="btn-primary" onclick="saveNickname()">Далее</button>
     </div>
 
@@ -127,6 +190,12 @@
   </div>
 </div>
 
+<!-- ================= DEV КНОПКА СБРОСА ================= -->
+<!-- Добавлена после закрывающего тега онбординга, но перед скриптами -->
+<button id="dev-reset-btn" class="dev-reset-btn" onclick="resetAccount()">
+  🔄 СБРОС АККАУНТА (DEV)
+</button>
+
 <!-- ================= ПОДКЛЮЧЕНИЕ ЛОГИКИ ================= -->
 <script src="state.js"></script>
 <script src="ui.js"></script>
@@ -140,6 +209,10 @@
       const tg = window.Telegram.WebApp;
       tg.expand();
       tg.enableClosingConfirmation();
+      
+      // Устанавливаем цвет фона в соответствии с темой Telegram
+      tg.setHeaderColor('#050810');
+      tg.setBackgroundColor('#050810');
     }
     
     // Фикс для iOS Safari 100vh проблемы
@@ -173,6 +246,35 @@
       }
     }, 1000);
   });
+
+  // Дополнительная проверка для DEV режима
+  // Если DEV_MODE включен, показываем кнопку с анимацией
+  window.addEventListener('load', function() {
+    if (window.DEV_MODE === true) {
+      const devBtn = document.getElementById('dev-reset-btn');
+      if (devBtn) {
+        devBtn.classList.add('pulse');
+        
+        // Убираем пульсацию через 5 секунд
+        setTimeout(() => {
+          devBtn.classList.remove('pulse');
+        }, 5000);
+      }
+    }
+  });
+</script>
+
+<!-- Добавляем небольшую защиту от случайного нажатия на DEV кнопку -->
+<script>
+  // Дополнительная защита для DEV кнопки
+  const originalResetAccount = window.resetAccount;
+  if (originalResetAccount) {
+    window.resetAccount = function() {
+      if (confirm('⚠️ ВНИМАНИЕ! ⚠️\n\nВы действительно хотите сбросить аккаунт?\nВесь прогресс будет безвозвратно удалён.')) {
+        originalResetAccount();
+      }
+    };
+  }
 </script>
 
 </body>
