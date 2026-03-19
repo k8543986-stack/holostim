@@ -5,9 +5,10 @@
   <title>Holostim — Mini App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   
-  <!-- Favicon (эмодзи вместо файла) -->
+  <!-- Favicon - принудительно отключаем запрос favicon.ico -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
-
+  <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+  
   <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -55,76 +56,7 @@
       accent-color: #ffcc33;
       margin: 0;
     }
-    
-    .consent a {
-      color: #ffcc33;
-      text-decoration: none;
-      margin-left: 5px;
-    }
-    
-    .consent a:hover {
-      text-decoration: underline;
-    }
     /* ===== КОНЕЦ СТИЛЕЙ ===== */
-
-    /* ===== СТИЛИ ДЛЯ DEV КНОПКИ ===== */
-    .dev-reset-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      background: rgba(255, 0, 0, 0.9);
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 12px 24px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      display: block; /* ИЗМЕНЕНО: было none, теперь block */
-    }
-
-    .dev-reset-btn:hover {
-      background: rgba(255, 0, 0, 1);
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
-    }
-
-    .dev-reset-btn:active {
-      transform: scale(0.95);
-    }
-
-    @media (max-width: 480px) {
-      .dev-reset-btn {
-        bottom: 15px;
-        right: 15px;
-        padding: 10px 20px;
-        font-size: 12px;
-      }
-    }
-
-    @keyframes devPulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
-      }
-      70% {
-        box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-      }
-    }
-
-    .dev-reset-btn.pulse {
-      animation: devPulse 2s infinite;
-    }
-    /* ===== КОНЕЦ СТИЛЕЙ DEV КНОПКИ ===== */
   </style>
 </head>
 <body>
@@ -149,7 +81,6 @@
         <img src="assets/img/johnwick_gender.jpg" class="wick-bg" alt="Выбор персонажа">
         <div class="wick-overlay"></div>
 
-        <!-- Возвращаем onclick для надежности + сохраняем id для JS -->
         <button class="wick-zone wick-male" id="choose-male" onclick="window.chooseGender('male'); return false;" aria-label="Выбрать мужского персонажа"></button>
         <button class="wick-zone wick-female" id="choose-female" onclick="window.chooseGender('female'); return false;" aria-label="Выбрать женского персонажа"></button>
 
@@ -185,59 +116,103 @@
   </div>
 </div>
 
-<!-- ================= DEV КНОПКА СБРОСА ================= -->
-<button id="dev-reset-btn" class="dev-reset-btn" onclick="window.resetAccount(); return false;" style="
-    position: fixed !important;
-    bottom: 30px !important;
-    right: 20px !important;
-    z-index: 999999 !important;
-    background: #ff0000 !important;
-    color: white !important;
-    border: 3px solid white !important;
-    border-radius: 50px !important;
-    padding: 15px 25px !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
-    display: block !important;
-    width: auto !important;
-    height: auto !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-">🔴 СБРОСИТЬ АККАУНТ</button>
-
 <!-- ================= ПОДКЛЮЧЕНИЕ СКРИПТОВ ================= -->
 <script src="state.js"></script>
 <script src="ui.js"></script>
 <script src="app.js"></script>
 
-<!-- ================= ПРОСТОЙ И НАДЕЖНЫЙ КОД ================= -->
+<!-- ================= ГАРАНТИРОВАННОЕ ПОЯВЛЕНИЕ КНОПКИ СБРОСА ================= -->
 <script>
-  // Упрощенный код для гарантированной работы
-  
-  // 1. Принудительно показываем DEV кнопку сразу
   (function() {
-    const devBtn = document.getElementById('dev-reset-btn');
-    if (devBtn) {
-      devBtn.style.display = 'block';
-      console.log('✅ DEV кнопка активирована');
+    // Функция сброса (на случай если в app.js её нет)
+    if (typeof window.resetAccount !== 'function') {
+      window.resetAccount = function() {
+        if (confirm('🔄 Сбросить аккаунт? Весь прогресс будет потерян.')) {
+          localStorage.removeItem('holostim_player');
+          localStorage.removeItem('holostim_player_temp');
+          localStorage.removeItem('player_rating_position');
+          window.location.href = 'index.html';
+        }
+      };
     }
-  })();
-  
-  // 2. Упрощенная инициализация
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log("📱 DOM загружен");
     
-    // Настройка Telegram
+    // Создаём кнопку сброса
+    function createResetButton() {
+      // Проверяем, может уже есть
+      let btn = document.getElementById('dev-reset-btn');
+      if (btn) {
+        btn.remove(); // Удаляем старую
+      }
+      
+      // Создаём новую
+      btn = document.createElement('button');
+      btn.id = 'dev-reset-btn';
+      btn.innerHTML = '🔴 СБРОС АККАУНТА';
+      btn.setAttribute('onclick', 'window.resetAccount(); return false;');
+      
+      // Стили - максимально заметные
+      btn.style.cssText = `
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 9999999 !important;
+        background: #ff3333 !important;
+        color: white !important;
+        border: 4px solid white !important;
+        border-radius: 60px !important;
+        padding: 16px 28px !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
+        cursor: pointer !important;
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.9) !important;
+        display: block !important;
+        width: auto !important;
+        height: auto !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        font-family: Arial, sans-serif !important;
+        line-height: normal !important;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.5) !important;
+      `;
+      
+      // Добавляем на страницу
+      document.body.appendChild(btn);
+      console.log('✅ Кнопка сброса создана и видна!');
+      
+      // Добавляем пульсацию
+      let pulse = 0;
+      setInterval(() => {
+        pulse = pulse === 0 ? 1 : 0;
+        btn.style.transform = pulse ? 'scale(1.1)' : 'scale(1)';
+        btn.style.transition = 'transform 0.5s';
+      }, 500);
+    }
+    
+    // Создаём кнопку когда страница загрузится
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', createResetButton);
+    } else {
+      createResetButton();
+    }
+    
+    // И ещё раз через секунду для надёжности
+    setTimeout(createResetButton, 1000);
+  })();
+</script>
+
+<!-- ================= ПРОСТЫЕ ОБРАБОТЧИКИ ================= -->
+<script>
+  // Настройка чекбокса
+  document.addEventListener('DOMContentLoaded', function() {
+    // Telegram
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.expand();
     }
     
-    // Настройка чекбокса
+    // Чекбокс
     const consentCheckbox = document.getElementById('consentCheckbox');
     const finishBtn = document.getElementById('finishBtn');
     
@@ -247,93 +222,31 @@
       });
     }
     
-    // Фикс высоты для iOS
-    function setHeight() {
+    // Высота для iOS
+    const setHeight = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
-      document.querySelector('.screen').style.minHeight = window.innerHeight + 'px';
-      document.querySelector('.onboarding-card').style.minHeight = window.innerHeight + 'px';
-    }
+      const screen = document.querySelector('.screen');
+      const card = document.querySelector('.onboarding-card');
+      if (screen) screen.style.minHeight = window.innerHeight + 'px';
+      if (card) card.style.minHeight = window.innerHeight + 'px';
+    };
     
     setHeight();
     window.addEventListener('resize', setHeight);
   });
-  
-  // 3. Резервный план - если функции из app.js не загрузились
-  window.addEventListener('load', function() {
-    console.log("✅ Страница загружена");
-    
-    // Проверяем функции и создаем заглушки если нужно
-    if (typeof window.chooseGender !== 'function') {
-      console.warn("⚠️ Создаем заглушки для функций");
-      
-      window.chooseGender = function(gender) {
-        console.log("🔥 Заглушка chooseGender:", gender);
-        alert("Функции приложения загружаются... Попробуйте через секунду");
-      };
-      
-      window.saveNickname = function() {
-        alert("Функции приложения загружаются... Попробуйте через секунду");
-      };
-      
-      window.finishRegistration = function() {
-        alert("Функции приложения загружаются... Попробуйте через секунду");
-      };
-    }
-    
-    // Убеждаемся что DEV кнопка видна
-    const devBtn = document.getElementById('dev-reset-btn');
-    if (devBtn) {
-      devBtn.style.display = 'block';
-    }
-  });
+</script>
+
+<!-- Фикс для favicon.ico - перехватываем запрос -->
 <script>
-  // ЭКСТРЕННОЕ СОЗДАНИЕ КНОПКИ СБРОСА
-  (function() {
-    // Удаляем старую кнопку если есть
-    const oldBtn = document.getElementById('dev-reset-btn');
-    if (oldBtn) oldBtn.remove();
-    
-    // Создаем новую кнопку
-    const btn = document.createElement('button');
-    btn.id = 'dev-reset-btn';
-    btn.innerHTML = '🔴 СБРОСИТЬ АККАУНТ';
-    btn.setAttribute('onclick', 'window.resetAccount(); return false;');
-    
-    // Стили прямо в коде
-    btn.style.cssText = `
-      position: fixed !important;
-      bottom: 30px !important;
-      right: 20px !important;
-      z-index: 999999 !important;
-      background: #ff0000 !important;
-      color: white !important;
-      border: 3px solid white !important;
-      border-radius: 50px !important;
-      padding: 15px 25px !important;
-      font-size: 18px !important;
-      font-weight: bold !important;
-      cursor: pointer !important;
-      box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
-      display: block !important;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    `;
-    
-    // Добавляем на страницу
-    document.body.appendChild(btn);
-    console.log('✅ Кнопка сброса создана принудительно!');
-    
-    // Добавляем функцию сброса если её нет
-    if (typeof window.resetAccount !== 'function') {
-      window.resetAccount = function() {
-        if (confirm('Сбросить аккаунт?')) {
-          localStorage.clear();
-          location.reload();
-        }
-      };
+  // Это полностью блокирует запрос favicon.ico
+  const originalFetch = window.fetch;
+  window.fetch = function(url, options) {
+    if (url === '/favicon.ico' || url === 'favicon.ico' || url.includes('favicon.ico')) {
+      return Promise.resolve(new Response(null, { status: 204 }));
     }
-  })();
+    return originalFetch(url, options);
+  };
 </script>
 
 </body>
