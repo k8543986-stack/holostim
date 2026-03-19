@@ -183,9 +183,29 @@
 </div>
 
 <!-- ================= DEV КНОПКА СБРОСА ================= -->
-<button id="dev-reset-btn" class="dev-reset-btn pulse" onclick="window.resetAccount(); return false;">
-  🔄 СБРОС АККАУНТА (DEV)
-</button>
+<button id="dev-reset-btn" class="dev-reset-btn" onclick="window.resetAccount(); return false;" style="
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 20px !important;
+    z-index: 999999 !important;
+    background: #ff0000 !important;
+    color: white !important;
+    border: 3px solid white !important;
+    border-radius: 50px !important;
+    padding: 15px 25px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+">🔴 СБРОСИТЬ АККАУНТ</button>
 
 <!-- ================= ПОДКЛЮЧЕНИЕ СКРИПТОВ ================= -->
 <script src="state.js"></script>
