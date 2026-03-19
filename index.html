@@ -284,6 +284,53 @@
       devBtn.style.display = 'block';
     }
   });
+<script>
+  // ЭКСТРЕННОЕ СОЗДАНИЕ КНОПКИ СБРОСА
+  (function() {
+    // Удаляем старую кнопку если есть
+    const oldBtn = document.getElementById('dev-reset-btn');
+    if (oldBtn) oldBtn.remove();
+    
+    // Создаем новую кнопку
+    const btn = document.createElement('button');
+    btn.id = 'dev-reset-btn';
+    btn.innerHTML = '🔴 СБРОСИТЬ АККАУНТ';
+    btn.setAttribute('onclick', 'window.resetAccount(); return false;');
+    
+    // Стили прямо в коде
+    btn.style.cssText = `
+      position: fixed !important;
+      bottom: 30px !important;
+      right: 20px !important;
+      z-index: 999999 !important;
+      background: #ff0000 !important;
+      color: white !important;
+      border: 3px solid white !important;
+      border-radius: 50px !important;
+      padding: 15px 25px !important;
+      font-size: 18px !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
+      display: block !important;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    `;
+    
+    // Добавляем на страницу
+    document.body.appendChild(btn);
+    console.log('✅ Кнопка сброса создана принудительно!');
+    
+    // Добавляем функцию сброса если её нет
+    if (typeof window.resetAccount !== 'function') {
+      window.resetAccount = function() {
+        if (confirm('Сбросить аккаунт?')) {
+          localStorage.clear();
+          location.reload();
+        }
+      };
+    }
+  })();
 </script>
 
 </body>
