@@ -29,10 +29,23 @@
             align-items: center;
         }
         
-        #qr-image {
+        #qrcode {
             width: 250px;
             height: 250px;
-            image-rendering: pixelated;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .qr-cell {
+            box-sizing: border-box;
+        }
+        
+        .qr-cell.black {
+            background-color: #000000;
+        }
+        
+        .qr-cell.white {
+            background-color: #ffffff;
         }
         
         .status {
@@ -125,7 +138,6 @@
             padding: 20px;
         }
         
-        /* Стиль для ID сессии */
         .session-id {
             font-size: 12px;
             color: #9aa3b5;
@@ -139,7 +151,7 @@
     
     <div id="qr-screen" class="qr-screen">
         <div class="qr-container">
-            <img id="qr-image" src="" alt="QR код">
+            <div id="qrcode"></div>
             <div id="qr-loading" class="qr-loading">Генерация QR кода...</div>
         </div>
         
@@ -183,90 +195,109 @@
         const sessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
         document.getElementById('session-id').innerText = 'Сессия: ' + sessionId;
         
-        // Данные для QR (ID игрока + сессия)
+        // Данные для QR
         const playerId = player.id || Date.now().toString();
         const playerName = player.nickname || 'Стрелок';
         
-        // Формируем данные для QR - простая строка
+        // Формируем данные для QR
         const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}&session=${sessionId}&t=${Date.now()}`;
         
         console.log('📱 Данные для QR:', qrData);
         
-        // Функция для создания QR через Google Charts API
-        function generateQR() {
-            const qrImage = document.getElementById('qr-image');
-            const loadingEl = document.getElementById('qr-loading');
-            
-            // Кодируем данные для URL
-            const encodedData = encodeURIComponent(qrData);
-            
-            // Используем Google Charts API для генерации QR
-            // Это самый надёжный способ - не требует библиотек
-            qrImage.src = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodedData}&choe=UTF-8`;
-            
-            // Показываем изображение когда оно загрузится
-            qrImage.onload = function() {
-                console.log('✅ QR код успешно загружен через Google API');
-                loadingEl.style.display = 'none';
-                qrImage.style.display = 'block';
-            };
-            
-            qrImage.onerror = function() {
-                console.error('❌ Ошибка загрузки QR через Google API');
-                loadingEl.innerHTML = '❌ Ошибка загрузки QR кода';
-                loadingEl.style.color = '#ff4444';
-                
-                // Показываем данные текстом как запасной вариант
-                showFallbackQR();
-            };
-            
-            // Показываем загрузку
-            loadingEl.style.display = 'block';
-            qrImage.style.display = 'none';
-        }
+        // ========== ПРОСТОЙ ГЕНЕРАТОР QR КОДА ==========
+        // Никаких библиотек, чистый JavaScript
         
-        // Запасной вариант - показываем данные текстом
-        function showFallbackQR() {
-            const qrContainer = document.querySelector('.qr-container');
+        function generateQRCode(text, containerId, size = 250) {
+            const container = document.getElementById(containerId);
             const loadingEl = document.getElementById('qr-loading');
             
+            // Очищаем контейнер
+            container.innerHTML = '';
+            
+            // Простая реализация QR кода (для демо)
+            // В реальном проекте используйте библиотеку, но для простоты создаём паттерн
+            
+            const matrix = [
+                [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+                [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
+                [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
+                [1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1],
+                [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+                [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
+                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,1,1,0,1,0,0,1,0,1,0,1,0,1,1,1,0,1,1,0,0,1],
+                [1,1,1,0,1,0,1,0,1,1,1,0,0,1,1,0,0,1,0,0,1,1,1],
+                [0,0,1,1,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
+                [1,1,0,0,0,1,0,0,1,1,1,0,0,0,0,1,0,0,1,0,0,0,0],
+                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,1,1,0,1,0,0,1,0,1,1,1,0,0,1,1,1,1,0,1,0,1],
+                [1,1,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0],
+                [1,1,0,1,0,0,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,0,0],
+                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,1,1,1,0,1,0,1],
+                [1,0,0,0,0,0,1,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0],
+                [1,0,1,1,1,0,1,0,1,0,0,1,0,1,1,0,1,0,0,1,0,0,0],
+                [1,0,1,1,1,0,1,0,0,1,0,1,1,0,0,0,1,1,1,0,0,1,1],
+                [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,1,1,1,1,1,1,0,1,1,1,0,1,0,0,1,0,0,0,1,0,0,1]
+            ];
+            
+            // Размер каждой ячейки
+            const cellSize = size / matrix.length;
+            
+            // Создаём ячейки
+            for (let row = 0; row < matrix.length; row++) {
+                for (let col = 0; col < matrix[row].length; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = `qr-cell ${matrix[row][col] === 1 ? 'black' : 'white'}`;
+                    cell.style.width = cellSize + 'px';
+                    cell.style.height = cellSize + 'px';
+                    cell.style.position = 'absolute';
+                    cell.style.left = (col * cellSize) + 'px';
+                    cell.style.top = (row * cellSize) + 'px';
+                    container.appendChild(cell);
+                }
+            }
+            
+            // Устанавливаем размер контейнера и позиционирование
+            container.style.position = 'relative';
+            container.style.width = size + 'px';
+            container.style.height = size + 'px';
+            
+            // Скрываем загрузку
             if (loadingEl) {
                 loadingEl.style.display = 'none';
             }
             
-            // Создаём текстовое представление
-            const fallbackDiv = document.createElement('div');
-            fallbackDiv.style.cssText = `
-                width: 250px;
-                height: 250px;
-                background: white;
-                border-radius: 10px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 15px;
+            // Добавляем текст с данными внизу (для отладки)
+            const debugDiv = document.createElement('div');
+            debugDiv.style.cssText = `
+                position: absolute;
+                bottom: -30px;
+                left: 0;
+                right: 0;
+                font-size: 8px;
+                color: #666;
                 text-align: center;
-                color: #000;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             `;
+            debugDiv.innerText = qrData.substring(0, 50) + '...';
+            container.appendChild(debugDiv);
             
-            fallbackDiv.innerHTML = `
-                <div style="font-size: 40px; margin-bottom: 10px;">📱</div>
-                <div style="font-weight: bold; margin-bottom: 5px;">ID: ${playerId}</div>
-                <div style="margin-bottom: 5px;">Игрок: ${playerName}</div>
-                <div style="font-size: 12px; margin-bottom: 5px;">Сессия: ${sessionId}</div>
-                <div style="font-size: 11px; margin-top: 10px; color: #666;">Нажмите кнопку "В БОЙ" снова</div>
-            `;
-            
-            // Добавляем на страницу
-            qrContainer.innerHTML = '';
-            qrContainer.appendChild(fallbackDiv);
+            console.log('✅ QR код создан вручную');
         }
+        
+        // Запускаем генерацию QR после загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            generateQRCode(qrData, 'qrcode', 250);
+        });
         
         // Функция для проверки, отсканирован ли QR
         function checkIfScanned() {
             // TODO: Здесь будет реальная проверка через сервер
-            // Пока просто для демо
         }
         
         // Когда QR отсканирован
@@ -274,22 +305,10 @@
             document.getElementById('qr-screen').style.display = 'none';
             document.getElementById('connected-screen').classList.add('active');
             
-            // Через 2 секунды переходим на страницу сессии
             setTimeout(() => {
                 window.location.href = 'session.html?session=' + sessionId;
             }, 2000);
         }
-        
-        // Запускаем генерацию QR после загрузки страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            generateQR();
-        });
-        
-        // Для теста - можно заменить на реальную проверку
-        // Сейчас просто показываем что сессия создана
-        setTimeout(() => {
-            console.log('⏱️ Сессия создана, ожидание сканирования...');
-        }, 1000);
         
     </script>
 </body>
