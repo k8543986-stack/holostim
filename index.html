@@ -5,7 +5,7 @@
   <title>Holostim — Mini App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 
-  <!-- Telegram Mini App SDK -->
+  <!-- Telegram Mini App SDK (загружается первым) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Основные стили -->
@@ -28,7 +28,7 @@
     
     /* ===== СТИЛИ ДЛЯ ЧЕКБОКСА СОГЛАСИЯ ===== */
     .consent {
-      color: white !important;  /* Белый текст */
+      color: white !important;
       font-size: 14px;
       display: flex;
       align-items: center;
@@ -49,11 +49,10 @@
       width: 20px;
       height: 20px;
       cursor: pointer;
-      accent-color: #ffcc33;  /* Золотой цвет для галочки */
+      accent-color: #ffcc33;
       margin: 0;
     }
     
-    /* Стили для ссылки на политику (если добавишь) */
     .consent a {
       color: #ffcc33;
       text-decoration: none;
@@ -85,7 +84,7 @@
       box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
       letter-spacing: 1px;
       text-transform: uppercase;
-      display: none; /* Скрыта по умолчанию, будет показана через JS в DEV_MODE */
+      display: none;
     }
 
     .dev-reset-btn:hover {
@@ -98,7 +97,6 @@
       transform: scale(0.95);
     }
 
-    /* Стили для мобильных устройств */
     @media (max-width: 480px) {
       .dev-reset-btn {
         bottom: 15px;
@@ -108,7 +106,6 @@
       }
     }
 
-    /* Анимация пульсации для привлечения внимания (опционально) */
     @keyframes devPulse {
       0% {
         box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
@@ -125,6 +122,11 @@
       animation: devPulse 2s infinite;
     }
     /* ===== КОНЕЦ СТИЛЕЙ DEV КНОПКИ ===== */
+
+    /* Временная заглушка для функций (пока загружаются скрипты) */
+    .function-placeholder {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -149,13 +151,9 @@
         <img src="assets/img/johnwick_gender.jpg" class="wick-bg" alt="Выбор персонажа">
         <div class="wick-overlay"></div>
 
-        <button class="wick-zone wick-male"
-                onclick="chooseGender('male')"
-                aria-label="Выбрать мужского персонажа"></button>
-
-        <button class="wick-zone wick-female"
-                onclick="chooseGender('female')"
-                aria-label="Выбрать женского персонажа"></button>
+        <!-- Убираем onclick из HTML, будем назначать обработчики через JS -->
+        <button class="wick-zone wick-male" id="choose-male" aria-label="Выбрать мужского персонажа"></button>
+        <button class="wick-zone wick-female" id="choose-female" aria-label="Выбрать женского персонажа"></button>
 
         <div class="wick-label wick-label-male">МУЖЧИНА</div>
         <div class="wick-label wick-label-female">ДЕВУШКА</div>
@@ -168,7 +166,7 @@
       <p>Этот ник будут видеть в системе</p>
 
       <input type="text" id="nicknameInput" placeholder="Введите ник" maxlength="20">
-      <button class="btn-primary" onclick="saveNickname()">Далее</button>
+      <button class="btn-primary" id="save-nickname-btn">Далее</button>
     </div>
 
     <!-- Шаг 3 -->
@@ -181,8 +179,7 @@
         Я согласен на обработку персональных данных
       </label>
 
-      <button class="btn-primary" id="finishBtn" disabled
-              onclick="finishRegistration()">
+      <button class="btn-primary" id="finishBtn" disabled>
         Создать аккаунт
       </button>
     </div>
@@ -191,31 +188,93 @@
 </div>
 
 <!-- ================= DEV КНОПКА СБРОСА ================= -->
-<!-- Добавлена после закрывающего тега онбординга, но перед скриптами -->
-<button id="dev-reset-btn" class="dev-reset-btn" onclick="resetAccount()">
+<button id="dev-reset-btn" class="dev-reset-btn">
   🔄 СБРОС АККАУНТА (DEV)
 </button>
 
-<!-- ================= ПОДКЛЮЧЕНИЕ ЛОГИКИ ================= -->
+<!-- ================= ПОДКЛЮЧЕНИЕ СКРИПТОВ ================= -->
+<!-- ВАЖНО: правильный порядок загрузки -->
 <script src="state.js"></script>
 <script src="ui.js"></script>
 <script src="app.js"></script>
 
 <script>
-  // Инициализация Telegram WebApp
+  // Функция для назначения обработчиков событий после загрузки всех скриптов
+  function initializeEventListeners() {
+    console.log("🔄 Инициализация обработчиков событий...");
+    
+    // Проверяем, загружены ли все необходимые функции
+    if (typeof window.chooseGender !== 'function') {
+      console.error("❌ Функция chooseGender не загружена!");
+      return;
+    }
+    
+    // Назначаем обработчики для выбора пола
+    const maleBtn = document.getElementById('choose-male');
+    const femaleBtn = document.getElementById('choose-female');
+    
+    if (maleBtn) {
+      maleBtn.onclick = function(e) {
+        e.preventDefault();
+        console.log("👆 Клик по мужскому полу");
+        window.chooseGender('male');
+      };
+    }
+    
+    if (femaleBtn) {
+      femaleBtn.onclick = function(e) {
+        e.preventDefault();
+        console.log("👆 Клик по женскому полу");
+        window.chooseGender('female');
+      };
+    }
+    
+    // Назначаем обработчик для сохранения ника
+    const saveBtn = document.getElementById('save-nickname-btn');
+    if (saveBtn && typeof window.saveNickname === 'function') {
+      saveBtn.onclick = function(e) {
+        e.preventDefault();
+        window.saveNickname();
+      };
+    }
+    
+    // Назначаем обработчик для завершения регистрации
+    const finishBtn = document.getElementById('finishBtn');
+    if (finishBtn && typeof window.finishRegistration === 'function') {
+      finishBtn.onclick = function(e) {
+        e.preventDefault();
+        window.finishRegistration();
+      };
+    }
+    
+    // Назначаем обработчик для DEV кнопки
+    const devBtn = document.getElementById('dev-reset-btn');
+    if (devBtn && typeof window.resetAccount === 'function') {
+      devBtn.onclick = function(e) {
+        e.preventDefault();
+        if (confirm('⚠️ Сбросить аккаунт? Весь прогресс будет потерян.')) {
+          window.resetAccount();
+        }
+      };
+    }
+    
+    console.log("✅ Обработчики событий назначены");
+  }
+
+  // Ждем загрузки DOM и всех скриптов
   document.addEventListener('DOMContentLoaded', function() {
+    console.log("📱 DOM загружен");
+    
     // Растягиваем на весь экран в Telegram
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.expand();
       tg.enableClosingConfirmation();
-      
-      // Устанавливаем цвет фона в соответствии с темой Telegram
       tg.setHeaderColor('#050810');
       tg.setBackgroundColor('#050810');
     }
     
-    // Фикс для iOS Safari 100vh проблемы
+    // Фикс для iOS Safari
     function setFullHeight() {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -231,12 +290,11 @@
       });
     }
     
-    // Установить высоту при загрузке и изменении размера
     setFullHeight();
     window.addEventListener('resize', setFullHeight);
     window.addEventListener('orientationchange', setFullHeight);
     
-    // Проверка изображений (fallback если нет картинок)
+    // Проверка изображений
     setTimeout(() => {
       const bgImg = document.querySelector('.wick-bg');
       if (bgImg && bgImg.naturalHeight === 0) {
@@ -245,17 +303,36 @@
         document.querySelector('.wick-gender-screen').style.background = 'linear-gradient(135deg, #1a1a2e, #16213e)';
       }
     }, 1000);
+    
+    // Инициализируем обработчики событий
+    // Даем небольшую задержку для загрузки app.js
+    setTimeout(initializeEventListeners, 100);
   });
 
-  // Дополнительная проверка для DEV режима
-  // Если DEV_MODE включен, показываем кнопку с анимацией
+  // Дополнительная проверка после полной загрузки страницы
   window.addEventListener('load', function() {
+    console.log("✅ Страница полностью загружена");
+    
+    // Проверяем наличие функций
+    console.log("📋 Проверка функций:", {
+      chooseGender: typeof window.chooseGender,
+      saveNickname: typeof window.saveNickname,
+      finishRegistration: typeof window.finishRegistration,
+      resetAccount: typeof window.resetAccount
+    });
+    
+    // Если функции все еще не загружены, пробуем еще раз
+    if (typeof window.chooseGender !== 'function') {
+      console.warn("⚠️ Функции не загружены, пробуем еще раз...");
+      setTimeout(initializeEventListeners, 500);
+    }
+    
+    // Показываем DEV кнопку если режим включен
     if (window.DEV_MODE === true) {
       const devBtn = document.getElementById('dev-reset-btn');
       if (devBtn) {
+        devBtn.style.display = 'block';
         devBtn.classList.add('pulse');
-        
-        // Убираем пульсацию через 5 секунд
         setTimeout(() => {
           devBtn.classList.remove('pulse');
         }, 5000);
@@ -264,17 +341,39 @@
   });
 </script>
 
-<!-- Добавляем небольшую защиту от случайного нажатия на DEV кнопку -->
+<!-- Экстренный fallback на случай если функции не загрузились -->
 <script>
-  // Дополнительная защита для DEV кнопки
-  const originalResetAccount = window.resetAccount;
-  if (originalResetAccount) {
-    window.resetAccount = function() {
-      if (confirm('⚠️ ВНИМАНИЕ! ⚠️\n\nВы действительно хотите сбросить аккаунт?\nВесь прогресс будет безвозвратно удалён.')) {
-        originalResetAccount();
+  // Резервный план - если функции не загрузились через обычные обработчики
+  document.addEventListener('click', function(e) {
+    // Проверяем клик по зонам выбора пола
+    if (e.target.classList.contains('wick-male') || e.target.classList.contains('wick-female')) {
+      e.preventDefault();
+      
+      if (typeof window.chooseGender === 'function') {
+        const gender = e.target.classList.contains('wick-male') ? 'male' : 'female';
+        window.chooseGender(gender);
+      } else {
+        console.error("❌ chooseGender не определена");
+        alert("Ошибка загрузки приложения. Пожалуйста, обновите страницу.");
       }
-    };
-  }
+    }
+    
+    // Проверяем клик по кнопке сохранения ника
+    if (e.target.id === 'save-nickname-btn' || e.target.classList.contains('save-nickname-btn')) {
+      e.preventDefault();
+      if (typeof window.saveNickname === 'function') {
+        window.saveNickname();
+      }
+    }
+    
+    // Проверяем клик по кнопке завершения
+    if (e.target.id === 'finishBtn') {
+      e.preventDefault();
+      if (typeof window.finishRegistration === 'function') {
+        window.finishRegistration();
+      }
+    }
+  });
 </script>
 
 </body>
