@@ -186,11 +186,15 @@
         // Показываем информацию об игроке
         document.getElementById('player-info').innerHTML = `🎮 ${playerName}`;
         
-        // ФОРМИРУЕМ ПРАВИЛЬНЫЕ ДАННЫЕ ДЛЯ QR
-        // БЕЗ сессии - сессию создаёт Holostim ПК
-        const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}&timestamp=${Date.now()}`;
+        // ========== ВАЖНО: ЗДЕСЬ НЕТ СЕССИИ ==========
+        // Формируем данные ТОЛЬКО с информацией об игроке
+        // Сессию создаёт Holostim ПК!
+        const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}`;
         
-        console.log('📱 Данные для QR (без сессии):', qrData);
+        // Выводим в консоль для проверки
+        console.log('✅ ПРАВИЛЬНЫЕ ДАННЫЕ ДЛЯ QR (без сессии):', qrData);
+        console.log('📊 ID игрока:', playerId);
+        console.log('📊 Имя игрока:', playerName);
         
         // Функция для создания QR кода
         function generateQRCode(text, containerId) {
@@ -232,12 +236,32 @@
                 loadingEl.style.display = 'none';
                 
                 console.log('✅ QR код создан для игрока:', playerName);
-                console.log('📊 ID игрока:', playerId);
                 
             } catch (error) {
                 console.error('❌ Ошибка создания QR:', error);
                 loadingEl.innerHTML = '❌ Ошибка создания QR кода';
                 loadingEl.style.color = '#ff4444';
+                
+                // Показываем данные текстом как запасной вариант
+                container.innerHTML = `
+                    <div style="
+                        width: 250px;
+                        height: 250px;
+                        background: white;
+                        border-radius: 10px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 10px;
+                        text-align: center;
+                        color: #000;
+                    ">
+                        <div style="font-weight: bold;">${playerName}</div>
+                        <div style="font-size: 10px; margin-top: 5px;">ID: ${playerId.substring(0, 16)}</div>
+                    </div>
+                `;
+                loadingEl.style.display = 'none';
             }
         }
         
@@ -250,12 +274,11 @@
         
         // Функция для проверки подключения
         function checkConnection() {
-            // TODO: Здесь будет проверка через сервер Holostim
-            // Когда Holostim ПК отсканирует QR и создаст сессию,
-            // он должен отправить подтверждение на телефон
+            // TODO: Здесь Holostim ПК должен отправить подтверждение
+            // Когда сессия создана, нужно перейти на session.html
         }
         
-        // Проверяем подключение каждые 2 секунды
+        // Проверяем каждые 2 секунды
         setInterval(checkConnection, 2000);
         
     </script>
