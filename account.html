@@ -2,372 +2,448 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Holostim — Аккаунт</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="account.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Holostim — Сканирование QR</title>
     <style>
-        /* Дополнительные стили для улучшения интерфейса */
-        .rank-title {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ffcc33 0%, #ff9f43 100%);
+            padding: 24px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #1a1a2e;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+        
+        .header p {
+            color: rgba(26,26,46,0.8);
             font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .qr-section {
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .qr-wrapper {
+            background: white;
+            padding: 24px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin: 0 auto 24px;
+            display: inline-block;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        
+        #qrcode canvas,
+        #qrcode img {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        .player-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .player-row:last-child {
+            border-bottom: none;
+        }
+        
+        .player-label {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .player-value {
             color: #ffcc33;
-            margin: 4px 0;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: monospace;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 24px;
+            color: #ffcc33;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid rgba(255,204,51,0.3);
+        }
+        
+        .status.scanned {
+            background: rgba(76,175,80,0.2);
+            color: #4caf50;
+            border-color: #4caf50;
+        }
+        
+        .instructions {
+            padding: 20px 24px 24px;
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .instructions h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #ffcc33;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 10px 0;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .expand-btn {
+            margin-top: 20px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #ffcc33 0%, #ff9f43 100%);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 999px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        .xp-text {
-            font-size: 11px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 4px;
+        .expand-btn:active {
+            transform: scale(0.98);
         }
         
-        .nav-buttons {
-            position: absolute;
-            bottom: 100px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
-        
-        .nav-btn {
-            flex: 1;
-            padding: 14px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
+        .back-btn {
+            margin-top: 12px;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
             color: white;
-            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 999px;
             font-size: 14px;
-            letter-spacing: 1px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            text-transform: uppercase;
+            width: 100%;
         }
         
-        .nav-btn:hover {
-            background: rgba(255,204,51,0.2);
-            border-color: #ffcc33;
+        .back-btn:active {
+            background: rgba(255,255,255,0.2);
         }
         
-        .nav-btn.ranks {
-            background: linear-gradient(90deg, rgba(255,204,51,0.2), rgba(255,159,67,0.2));
-            border-color: #ffcc33;
+        /* Анимация пульсации для статуса */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
         }
         
-        .player-stats {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .league-badge {
-            background: rgba(255,204,51,0.15);
-            padding: 4px 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,204,51,0.3);
-            font-size: 12px;
-            color: #ffcc33;
-        }
-        
-        /* Стили для статуса подключения к ПК */
-        .pc-status {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            padding: 8px 16px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 20;
-            font-size: 12px;
-        }
-        
-        .pc-status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #666;
-        }
-        
-        .pc-status-dot.connected {
-            background: #4CAF50;
-            box-shadow: 0 0 10px #4CAF50;
-        }
-        
-        .pc-status-dot.searching {
-            background: #ffcc33;
+        .status-waiting {
             animation: pulse 1.5s infinite;
         }
         
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        /* Полноэкранный режим */
+        .container.fullscreen {
+            max-width: 100%;
+            border-radius: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
-        .pc-settings-btn {
-            background: transparent;
-            border: none;
-            color: #9aa3b5;
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 8px;
+        .container.fullscreen .qr-wrapper {
+            max-width: 90vw;
+            padding: 40px;
         }
         
-        .pc-settings-btn:hover {
-            color: #ffcc33;
+        .container.fullscreen .instructions,
+        .container.fullscreen .back-btn {
+            display: none;
         }
-
-        /* Стили для кнопки сброса */
-        .dev-reset-btn {
-            position: absolute;
-            bottom: 180px;  /* Расположена под кнопкой В БОЙ */
-            left: 20px;
-            right: 20px;
-            padding: 12px;
-            border-radius: 999px;
-            border: 2px solid rgba(255, 59, 48, 0.5);
-            background: rgba(255, 59, 48, 0.9);
-            backdrop-filter: blur(10px);
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            z-index: 100;
-            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
-            display: none; /* Скрыта по умолчанию */
-        }
-
-        .dev-reset-btn:hover {
-            background: rgba(255, 59, 48, 1);
-            transform: scale(1.02);
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 6px 20px rgba(255, 59, 48, 0.5);
-        }
-
-        .dev-reset-btn:active {
-            transform: scale(0.98);
-        }
-
-        .dev-reset-btn.visible {
-            display: block; /* Показываем когда нужно */
-        }
-
-        /* Адаптация для мобильных */
+        
         @media (max-width: 480px) {
-            .dev-reset-btn {
-                bottom: 160px;
-                padding: 10px;
-                font-size: 13px;
+            .qr-section {
+                padding: 20px 16px;
             }
-        }
-
-        /* Анимация пульсации для кнопки сброса */
-        @keyframes resetPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7);
+            
+            .qr-wrapper {
+                padding: 16px;
             }
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 59, 48, 0);
+            
+            .header h1 {
+                font-size: 24px;
             }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+            
+            .player-value {
+                font-size: 14px;
             }
-        }
-
-        .dev-reset-btn.pulse {
-            animation: resetPulse 2s infinite;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2-fix@0.0.1/qrcode.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-
-    <div id="account-bg" class="account-bg"></div>
-
-    <div class="hud">
-
-        <!-- Верхняя панель -->
-        <div class="hud-top">
-            <div class="player-block">
-                <div class="player-stats">
-                    <div class="nickname" id="nickname">PLAYER</div>
-                    <div class="rank-title" id="rankTitle">Начинающий стрелок</div>
-                    <div class="league-badge" id="league">Твёрдая рука</div>
-                </div>
-
-                <!-- Прогресс XP -->
-                <div style="margin-top: 12px;">
-                    <div class="xp-bar">
-                        <div class="xp-fill" id="xpFill" style="width: 0%;"></div>
-                    </div>
-                    <div class="xp-text" id="xpText">0 / 100 XP</div>
-                </div>
-            </div>
-
-            <div class="league-block">
-                <div class="league-title">СЛЕДУЮЩЕЕ</div>
-                <div class="league-name" id="nextRank">Рекрут</div>
-                <div style="font-size: 11px; color: #9aa3b5; margin-top: 4px;" id="xpNeeded">нужно 30 XP</div>
-            </div>
+    <div class="container" id="container">
+        <div class="header">
+            <h1>🎯 Holostim</h1>
+            <p>Сканирование для входа в тир</p>
         </div>
-
-        <!-- Правая панель (рейтинг) -->
-        <div class="hud-right">
-            <div class="rating-title">ТОП РЕЙТИНГА</div>
-            <div class="rating-list">
-                <div class="rating-row">1 · donk666 · 5075</div>
-                <div class="rating-row">2 · SEMEN_BAKIN · 4852</div>
-                <div class="rating-row">3 · m0NESY · 4790</div>
-                <!-- Ссылка на полный рейтинг -->
-                <div class="rating-row" style="border-bottom: none; color: #ffcc33; margin-top: 8px; cursor: pointer;" onclick="location.href='ratings.html'">
-                    ТВОЁ МЕСТО: <span id="playerRank">#42</span> 👆
+        
+        <div class="qr-section">
+            <div class="qr-wrapper">
+                <div id="qrcode"></div>
+            </div>
+            
+            <div class="player-card">
+                <div class="player-row">
+                    <span class="player-label">👤 Игрок</span>
+                    <span class="player-value" id="playerName">Загрузка...</span>
+                </div>
+                <div class="player-row">
+                    <span class="player-label">🆔 ID</span>
+                    <span class="player-value" id="playerId">---</span>
+                </div>
+                <div class="player-row">
+                    <span class="player-label">🎮 Сессия</span>
+                    <span class="player-value" id="sessionId">---</span>
                 </div>
             </div>
-
-            <!-- Статистика игрока -->
-            <div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-                    <span>Сессий:</span>
-                    <span id="sessionsCount" style="color: #ffcc33;">0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                    <span>Точность:</span>
-                    <span id="accuracy" style="color: #ffcc33;">0%</span>
-                </div>
+            
+            <div id="status" class="status status-waiting">
+                ⏳ Ожидание сканирования<br>
+                Направьте телефон на камеру ПК
             </div>
-        </div>
-
-        <!-- Кнопки навигации (звания и ачивки) -->
-        <div class="nav-buttons">
-            <button class="nav-btn ranks" onclick="location.href='rank_tree.html'">
-                🌳 ЗВАНИЯ
+            
+            <button id="expandBtn" class="expand-btn">
+                🔍 РАЗВЕРНУТЬ НА ВЕСЬ ЭКРАН
             </button>
-            <button class="nav-btn" onclick="location.href='achievements.html'">
-                🏆 АЧИВКИ
+            
+            <button id="backBtn" class="back-btn" onclick="goBack()">
+                ← НАЗАД В АККАУНТ
             </button>
         </div>
-
-        <!-- Кнопка БОЙ -->
-        <button class="btn-battle" onclick="startBattle()">
-            В БОЙ
-        </button>
-
-        <!-- DEV кнопка сброса (под кнопкой В БОЙ) -->
-        <button id="dev-reset-btn" class="dev-reset-btn" onclick="resetAccount()">
-            🔄 СБРОС АККАУНТА
-        </button>
-
-    </div> <!-- конец hud -->
-
-    <script src="account.js"></script>
+        
+        <div class="instructions">
+            <h3>📱 КАК ИСПОЛЬЗОВАТЬ:</h3>
+            <ol>
+                <li><strong>Держите телефон экраном к камере ПК</strong></li>
+                <li>Камера, которая смотрит на стрелка, отсканирует QR</li>
+                <li>После сканирования QR закроется автоматически</li>
+                <li>💡 <strong>Совет:</strong> Держите телефон на расстоянии 20-40 см от камеры</li>
+                <li>💡 <strong>Совет:</strong> Убедитесь, что QR код полностью виден в кадре</li>
+            </ol>
+        </div>
+    </div>
 
     <script>
-        // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С HOLOSTIM ПК ==========
-
-        // Функция начала боя - переход на сканирование QR
-        function startBattle() {
-            window.location.href = 'show-qr.html';
+        let tg = window.Telegram.WebApp;
+        let qrCode = null;
+        let isScanned = false;
+        let fullscreenMode = false;
+        
+        // Получаем данные от Telegram Mini App
+        const initData = tg.initDataUnsafe;
+        const user = initData.user;
+        
+        // Генерируем уникальный ID сессии (8 символов)
+        function generateSessionId() {
+            return Math.random().toString(36).substring(2, 10).toUpperCase();
         }
-
-        // Функция сброса аккаунта
-        window.resetAccount = function() {
-            if (confirm('⚠️ ВНИМАНИЕ!\n\nВы действительно хотите сбросить аккаунт?\nВесь прогресс будет безвозвратно удалён.')) {
-                // Очищаем все данные
-                localStorage.removeItem('holostim_player');
-                localStorage.removeItem('holostim_player_temp');
-                localStorage.removeItem('player_rating_position');
-                
-                // Показываем сообщение
-                alert('✅ Аккаунт сброшен. Перенаправление...');
-                
-                // Переходим на страницу регистрации
-                window.location.href = 'index.html';
-            }
-        };
-
-        // Загружаем место в рейтинге (используем другую переменную)
-        const savedPlayerRank = localStorage.getItem('player_rating_position');
-        if (savedPlayerRank) {
-            document.getElementById('playerRank').innerText = '#' + savedPlayerRank;
+        
+        // Создаем данные для QR кода
+        function generateQRData() {
+            const playerId = user ? user.id.toString() : 'guest_' + Date.now();
+            const playerName = user ? (user.first_name + (user.last_name ? ' ' + user.last_name : '')) : 'Гость';
+            const sessionId = generateSessionId();
+            
+            const qrData = {
+                player_id: playerId,
+                player_name: playerName,
+                session_id: sessionId,
+                timestamp: Date.now(),
+                version: "1.0"
+            };
+            
+            return JSON.stringify(qrData);
         }
-
-        // Загружаем статистику с ПК если есть подключение
-        async function loadPCStats() {
-            const pcIP = localStorage.getItem('holostim_pc_ip');
-            if (!pcIP) return;
-
-            try {
-                const response = await fetch(`http://${pcIP}:8000/api/session/current`);
-                const data = await response.json();
-
-                if (!data.error && data.player_name) {
-                    if (data.started) {
-                        const notification = document.createElement('div');
-                        notification.style.cssText = `
-                                position: fixed;
-                                top: 80px;
-                                left: 20px;
-                                right: 20px;
-                                background: linear-gradient(90deg, #ffcc33, #ff9f43);
-                                color: #000;
-                                padding: 12px;
-                                border-radius: 999px;
-                                text-align: center;
-                                font-weight: 600;
-                                z-index: 100;
-                                box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-                            `;
-                        notification.innerText = `🎯 Активная сессия: ${data.player_name} (${data.shots} выстрелов)`;
-                        document.body.appendChild(notification);
-                        setTimeout(() => notification.remove(), 5000);
-                    }
+        
+        // Создаем QR код увеличенного размера
+        function createQRCode() {
+            const qrData = generateQRData();
+            const qrcodeElement = document.getElementById('qrcode');
+            
+            // Очищаем предыдущий QR код
+            qrcodeElement.innerHTML = '';
+            
+            // Создаем новый QR код с увеличенным размером
+            qrCode = new QRCode(qrcodeElement, {
+                text: qrData,
+                width: 450,  // Увеличиваем ширину
+                height: 450, // Увеличиваем высоту
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H  // Высокий уровень коррекции ошибок
+            });
+            
+            // Показываем информацию об игроке
+            const parsedData = JSON.parse(qrData);
+            document.getElementById('playerName').textContent = parsedData.player_name;
+            document.getElementById('playerId').textContent = parsedData.player_id;
+            document.getElementById('sessionId').textContent = parsedData.session_id;
+            
+            console.log('✅ QR код создан:', parsedData);
+            console.log('   Размер:', '450x450 пикселей');
+            console.log('   Игрок:', parsedData.player_name);
+            
+            return parsedData;
+        }
+        
+        // Развернуть на весь экран
+        function expandQR() {
+            const container = document.getElementById('container');
+            const expandBtn = document.getElementById('expandBtn');
+            
+            if (!fullscreenMode) {
+                // Включаем полноэкранный режим
+                container.classList.add('fullscreen');
+                expandBtn.innerHTML = '✖️ ВЫЙТИ ИЗ ПОЛНОЭКРАННОГО РЕЖИМА';
+                fullscreenMode = true;
+                
+                // Дополнительно увеличиваем QR код
+                const qrCanvas = document.querySelector('#qrcode canvas');
+                if (qrCanvas) {
+                    qrCanvas.style.width = '100%';
+                    qrCanvas.style.height = 'auto';
                 }
-            } catch (error) {
-                // Игнорируем ошибки
+                
+                console.log('🔍 Полноэкранный режим активирован');
+            } else {
+                // Выходим из полноэкранного режима
+                container.classList.remove('fullscreen');
+                expandBtn.innerHTML = '🔍 РАЗВЕРНУТЬ НА ВЕСЬ ЭКРАН';
+                fullscreenMode = false;
+                
+                console.log('🔍 Полноэкранный режим деактивирован');
             }
         }
-
-        // Показываем кнопку сброса
-        function showResetButton() {
-            const devBtn = document.getElementById('dev-reset-btn');
-            if (devBtn) {
-                // Показываем кнопку
-                devBtn.classList.add('visible');
-                
-                // Добавляем пульсацию для привлечения внимания
-                devBtn.classList.add('pulse');
-                
-                // Убираем пульсацию через 5 секунд
-                setTimeout(() => {
-                    devBtn.classList.remove('pulse');
-                }, 5000);
-                
-                console.log('✅ Кнопка сброса активирована');
-            }
+        
+        // Возврат в аккаунт
+        function goBack() {
+            tg.close(); // Закрываем Mini App
+            window.location.href = 'account.html'; // Возврат на страницу аккаунта
         }
-
-        // Запускаем всё после загрузки страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            loadPCStats();
-            showResetButton();
+        
+        // Обновляем статус
+        function updateStatus() {
+            const statusDiv = document.getElementById('status');
+            
+            // Автоматически закрываем через 120 секунд если не отсканировано
+            setTimeout(() => {
+                if (!isScanned) {
+                    console.log('⏰ QR код не был отсканирован, закрываем...');
+                    statusDiv.innerHTML = '⏰ Время ожидания истекло<br>Нажмите "НАЗАД" для повторной попытки';
+                    statusDiv.classList.remove('status-waiting');
+                }
+            }, 120000);
+        }
+        
+        // Слушаем события от Telegram
+        tg.ready();
+        tg.expand(); // Раскрываем Mini App на весь экран
+        
+        // Создаем QR код
+        const qrData = createQRCode();
+        
+        // Добавляем обработчик для кнопки разворачивания
+        document.getElementById('expandBtn').addEventListener('click', expandQR);
+        
+        // Добавляем обработчик для кнопки назад
+        document.getElementById('backBtn').addEventListener('click', goBack);
+        
+        // Обновляем статус
+        updateStatus();
+        
+        // Сообщаем, что все готово
+        console.log('📱 QR Scanner готов');
+        console.log('📐 Рекомендуемое расстояние: 20-40 см от камеры');
+        
+        // Если пользователь пытается закрыть страницу
+        window.addEventListener('beforeunload', () => {
+            tg.close();
         });
-
-        // Для надёжности показываем кнопку и через секунду
-        setTimeout(showResetButton, 1000);
-
+        
+        // Дополнительная функция для увеличения QR при нажатии на него
+        const qrWrapper = document.querySelector('.qr-wrapper');
+        qrWrapper.addEventListener('click', expandQR);
     </script>
-
 </body>
 </html>
