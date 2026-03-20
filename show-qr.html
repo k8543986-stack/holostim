@@ -30,8 +30,14 @@
         }
         
         #qrcode {
-            width: 250px;
-            height: 250px;
+            width: 300px;      /* Увеличено с 250px до 300px (+20%) */
+            height: 300px;     /* Увеличено с 250px до 300px (+20%) */
+        }
+        
+        /* Стили для canvas внутри qrcode */
+        #qrcode canvas {
+            width: 300px !important;
+            height: 300px !important;
         }
         
         .status {
@@ -130,6 +136,23 @@
             text-align: center;
             font-weight: bold;
         }
+
+        /* Адаптация для мобильных устройств */
+        @media (max-width: 480px) {
+            #qrcode {
+                width: 260px;
+                height: 260px;
+            }
+            
+            #qrcode canvas {
+                width: 260px !important;
+                height: 260px !important;
+            }
+            
+            .qr-container {
+                padding: 15px;
+            }
+        }
     </style>
     <!-- Подключаем библиотеку для генерации QR кодов -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
@@ -186,7 +209,6 @@
         // Показываем информацию об игроке
         document.getElementById('player-info').innerHTML = `🎮 ${playerName}`;
         
-        // ========== ВАЖНО: ЗДЕСЬ НЕТ СЕССИИ ==========
         // Формируем данные ТОЛЬКО с информацией об игроке
         // Сессию создаёт Holostim ПК!
         const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}`;
@@ -196,7 +218,7 @@
         console.log('📊 ID игрока:', playerId);
         console.log('📊 Имя игрока:', playerName);
         
-        // Функция для создания QR кода
+        // Функция для создания QR кода с увеличенным размером
         function generateQRCode(text, containerId) {
             const container = document.getElementById(containerId);
             const loadingEl = document.getElementById('qr-loading');
@@ -212,12 +234,13 @@
                 
                 // Получаем размер модуля
                 const moduleCount = qr.getModuleCount();
-                const cellSize = Math.floor(250 / moduleCount);
+                // Увеличиваем размер ячейки для итогового размера 300px
+                const cellSize = Math.floor(300 / moduleCount);
                 
-                // Создаём canvas для отрисовки
+                // Создаём canvas для отрисовки с увеличенным размером 300x300
                 const canvas = document.createElement('canvas');
-                canvas.width = 250;
-                canvas.height = 250;
+                canvas.width = 300;
+                canvas.height = 300;
                 const ctx = canvas.getContext('2d');
                 
                 // Рисуем QR код
@@ -235,7 +258,7 @@
                 // Скрываем загрузку
                 loadingEl.style.display = 'none';
                 
-                console.log('✅ QR код создан для игрока:', playerName);
+                console.log('✅ QR код создан для игрока:', playerName, 'Размер: 300x300');
                 
             } catch (error) {
                 console.error('❌ Ошибка создания QR:', error);
@@ -245,8 +268,8 @@
                 // Показываем данные текстом как запасной вариант
                 container.innerHTML = `
                     <div style="
-                        width: 250px;
-                        height: 250px;
+                        width: 300px;
+                        height: 300px;
                         background: white;
                         border-radius: 10px;
                         display: flex;
