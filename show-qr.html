@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background: #050810;
             color: white;
             font-family: system-ui;
@@ -20,24 +20,29 @@
         
         .qr-container {
             background: white;
-            padding: 20px;
-            border-radius: 20px;
-            margin: 20px;
-            box-shadow: 0 0 30px rgba(255,204,51,0.3);
+            padding: 25px;
+            border-radius: 24px;
+            margin: 20px auto;
+            box-shadow: 0 0 40px rgba(255,204,51,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: fit-content;
+        }
+        
+        /* Основной контейнер QR - увеличиваем размер */
+        #qrcode {
             display: flex;
             justify-content: center;
             align-items: center;
         }
         
-        #qrcode {
-            width: 300px;      /* Увеличено с 250px до 300px (+20%) */
-            height: 300px;     /* Увеличено с 250px до 300px (+20%) */
-        }
-        
-        /* Стили для canvas внутри qrcode */
+        /* Увеличиваем canvas QR-кода */
         #qrcode canvas {
-            width: 300px !important;
-            height: 300px !important;
+            width: 400px !important;
+            height: 400px !important;
+            border-radius: 16px;
+            display: block;
         }
         
         .status {
@@ -46,13 +51,14 @@
         }
         
         .status-text {
-            font-size: 18px;
+            font-size: 20px;
             color: #ffcc33;
             margin-bottom: 10px;
+            font-weight: bold;
         }
         
         .status-detail {
-            font-size: 14px;
+            font-size: 16px;
             color: #9aa3b5;
         }
         
@@ -61,19 +67,20 @@
             padding: 20px;
             background: rgba(255,255,255,0.05);
             border-radius: 16px;
-            max-width: 300px;
+            max-width: 350px;
         }
         
         .instruction-step {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 10px 0;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 15px;
         }
         
         .step-number {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background: #ffcc33;
             color: #000;
             border-radius: 50%;
@@ -87,19 +94,25 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
-            font-size: 20px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             text-decoration: none;
             z-index: 100;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,204,51,0.3);
+            transform: scale(1.05);
         }
         
         .connected {
@@ -130,37 +143,61 @@
         }
         
         .player-info {
-            font-size: 16px;
+            font-size: 20px;
             color: #ffcc33;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
             font-weight: bold;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 24px;
+            border-radius: 40px;
+            display: inline-block;
         }
 
-        /* Адаптация для мобильных устройств */
-        @media (max-width: 480px) {
-            #qrcode {
-                width: 260px;
-                height: 260px;
-            }
-            
+        /* Адаптация для мобильных */
+        @media (max-width: 600px) {
             #qrcode canvas {
-                width: 260px !important;
-                height: 260px !important;
+                width: 320px !important;
+                height: 320px !important;
             }
             
             .qr-container {
-                padding: 15px;
+                padding: 18px;
+            }
+            
+            .status-text {
+                font-size: 18px;
+            }
+            
+            .instruction {
+                max-width: 280px;
             }
         }
+        
+        @media (max-width: 450px) {
+            #qrcode canvas {
+                width: 280px !important;
+                height: 280px !important;
+            }
+        }
+        
+        /* Анимация пульсации для привлечения внимания */
+        @keyframes glow {
+            0% { box-shadow: 0 0 0 0 rgba(255,204,51,0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255,204,51,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,204,51,0); }
+        }
+        
+        .qr-container {
+            animation: glow 2s infinite;
+        }
     </style>
-    <!-- Подключаем библиотеку для генерации QR кодов -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
     <a href="account.html" class="back-btn">←</a>
     
-    <div id="qr-screen" class="qr-screen">
+    <div id="qr-screen" class="qr-screen" style="text-align: center;">
         <div class="player-info" id="player-info"></div>
         
         <div class="qr-container">
@@ -209,16 +246,14 @@
         // Показываем информацию об игроке
         document.getElementById('player-info').innerHTML = `🎮 ${playerName}`;
         
-        // Формируем данные ТОЛЬКО с информацией об игроке
-        // Сессию создаёт Holostim ПК!
+        // Формируем данные для QR
         const qrData = `holostim://connect?player_id=${playerId}&player_name=${encodeURIComponent(playerName)}`;
         
-        // Выводим в консоль для проверки
-        console.log('✅ ПРАВИЛЬНЫЕ ДАННЫЕ ДЛЯ QR (без сессии):', qrData);
+        console.log('✅ Данные для QR:', qrData);
         console.log('📊 ID игрока:', playerId);
         console.log('📊 Имя игрока:', playerName);
         
-        // Функция для создания QR кода с увеличенным размером
+        // Функция для создания увеличенного QR кода
         function generateQRCode(text, containerId) {
             const container = document.getElementById(containerId);
             const loadingEl = document.getElementById('qr-loading');
@@ -227,28 +262,40 @@
             container.innerHTML = '';
             
             try {
-                // Создаём QR код с помощью библиотеки
+                // Создаём QR код
                 const qr = qrcode(0, 'H');
                 qr.addData(text);
                 qr.make();
                 
                 // Получаем размер модуля
                 const moduleCount = qr.getModuleCount();
-                // Увеличиваем размер ячейки для итогового размера 300px
-                const cellSize = Math.floor(300 / moduleCount);
                 
-                // Создаём canvas для отрисовки с увеличенным размером 300x300
+                // Устанавливаем большой размер QR - 400px
+                const qrSize = 400;
+                const cellSize = Math.floor(qrSize / moduleCount);
+                
+                // Создаём canvas с большим размером
                 const canvas = document.createElement('canvas');
-                canvas.width = 300;
-                canvas.height = 300;
+                canvas.width = qrSize;
+                canvas.height = qrSize;
                 const ctx = canvas.getContext('2d');
                 
-                // Рисуем QR код
+                // Заливаем белым фоном
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, qrSize, qrSize);
+                
+                // Рисуем чёрные квадраты QR кода
+                ctx.fillStyle = '#000000';
                 for (let row = 0; row < moduleCount; row++) {
                     for (let col = 0; col < moduleCount; col++) {
-                        const isBlack = qr.isDark(row, col);
-                        ctx.fillStyle = isBlack ? '#000000' : '#ffffff';
-                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                        if (qr.isDark(row, col)) {
+                            ctx.fillRect(
+                                col * cellSize,
+                                row * cellSize,
+                                cellSize,
+                                cellSize
+                            );
+                        }
                     }
                 }
                 
@@ -258,30 +305,33 @@
                 // Скрываем загрузку
                 loadingEl.style.display = 'none';
                 
-                console.log('✅ QR код создан для игрока:', playerName, 'Размер: 300x300');
+                console.log('✅ QR код создан! Размер:', qrSize + 'x' + qrSize);
+                console.log('📐 Модулей:', moduleCount, 'Размер ячейки:', cellSize + 'px');
                 
             } catch (error) {
                 console.error('❌ Ошибка создания QR:', error);
                 loadingEl.innerHTML = '❌ Ошибка создания QR кода';
                 loadingEl.style.color = '#ff4444';
                 
-                // Показываем данные текстом как запасной вариант
+                // Запасной вариант
                 container.innerHTML = `
                     <div style="
-                        width: 300px;
-                        height: 300px;
+                        width: 400px;
+                        height: 400px;
                         background: white;
-                        border-radius: 10px;
+                        border-radius: 16px;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
-                        padding: 10px;
                         text-align: center;
                         color: #000;
+                        font-size: 14px;
+                        padding: 20px;
                     ">
-                        <div style="font-weight: bold;">${playerName}</div>
-                        <div style="font-size: 10px; margin-top: 5px;">ID: ${playerId.substring(0, 16)}</div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">${playerName}</div>
+                        <div style="font-size: 11px; word-break: break-all;">ID: ${playerId}</div>
+                        <div style="font-size: 10px; margin-top: 15px; color: #666;">Ошибка генерации QR</div>
                     </div>
                 `;
                 loadingEl.style.display = 'none';
@@ -297,11 +347,9 @@
         
         // Функция для проверки подключения
         function checkConnection() {
-            // TODO: Здесь Holostim ПК должен отправить подтверждение
-            // Когда сессия создана, нужно перейти на session.html
+            // TODO: Здесь будет проверка подключения
         }
         
-        // Проверяем каждые 2 секунды
         setInterval(checkConnection, 2000);
         
     </script>
