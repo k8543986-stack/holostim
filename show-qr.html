@@ -23,7 +23,7 @@
         
         .container {
             text-align: center;
-            max-width: 350px;
+            max-width: 360px;
             width: 100%;
         }
         
@@ -32,11 +32,11 @@
             backdrop-filter: blur(10px);
             border-radius: 28px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         
         .player-name {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             color: #ffcc33;
             margin-bottom: 6px;
@@ -46,22 +46,26 @@
             font-size: 11px;
             color: #9aa3b5;
             font-family: monospace;
+            word-break: break-all;
         }
         
+        /* Убираем круглую рамку! QR должен быть полностью видим */
         .qr-wrapper {
             background: white;
-            padding: 12px;
-            border-radius: 24px;
-            margin: 16px auto;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 10px auto;
             display: inline-block;
             box-shadow: 0 0 20px rgba(255,204,51,0.3);
+            /* НЕТ обрезания! */
         }
         
+        /* QR код на белом фоне, полностью видимый */
         #qrcode canvas {
-            width: 220px !important;
-            height: 220px !important;
+            width: 280px !important;
+            height: 280px !important;
             display: block;
-            border-radius: 16px;
+            /* НЕТ border-radius, чтобы углы не обрезались! */
         }
         
         .status {
@@ -69,13 +73,13 @@
         }
         
         .status-text {
-            font-size: 16px;
+            font-size: 18px;
             color: #ffcc33;
             font-weight: bold;
         }
         
         .status-detail {
-            font-size: 12px;
+            font-size: 13px;
             color: #9aa3b5;
             margin-top: 4px;
         }
@@ -83,23 +87,23 @@
         .instruction {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
-            padding: 14px;
-            margin-top: 16px;
+            padding: 16px;
+            margin-top: 20px;
             text-align: left;
         }
         
         .instruction-step {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            font-size: 12px;
+            gap: 12px;
+            margin: 10px 0;
+            font-size: 13px;
             color: #fff;
         }
         
         .step-number {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             background: #ffcc33;
             color: #000;
             border-radius: 50%;
@@ -107,15 +111,15 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
         }
         
         .back-btn {
             position: fixed;
             top: 20px;
             left: 20px;
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             background: rgba(0,0,0,0.6);
             border-radius: 50%;
             display: flex;
@@ -123,18 +127,31 @@
             justify-content: center;
             color: white;
             text-decoration: none;
-            font-size: 20px;
+            font-size: 22px;
+            z-index: 100;
         }
         
         .debug-info {
             background: rgba(0,0,0,0.5);
             border-radius: 12px;
-            padding: 8px;
-            margin-top: 12px;
-            font-size: 9px;
+            padding: 10px;
+            margin-top: 16px;
+            font-size: 10px;
             font-family: monospace;
             color: #5f6a7e;
             word-break: break-all;
+            text-align: left;
+        }
+        
+        /* Адаптация для маленьких экранов */
+        @media (max-width: 450px) {
+            #qrcode canvas {
+                width: 240px !important;
+                height: 240px !important;
+            }
+            .qr-wrapper {
+                padding: 16px;
+            }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -148,13 +165,14 @@
             <div class="player-id" id="playerId">ID: ---</div>
         </div>
         
+        <!-- Убрана круглая рамка! QR полностью видим -->
         <div class="qr-wrapper">
             <div id="qrcode"></div>
         </div>
         
         <div class="status">
             <div class="status-text">🎯 Поднесите сканер</div>
-            <div class="status-detail">Сканер должен прочитать QR код</div>
+            <div class="status-detail">Сканер должен считать QR код полностью</div>
         </div>
         
         <div class="instruction">
@@ -201,23 +219,22 @@
         }
         
         // ============================================
-        // УПРОЩЁННЫЙ QR — ТОЛЬКО ЦИФРЫ (ID)
+        // БЕРЁМ РЕАЛЬНЫЙ ID ИЗ ДАННЫХ ИГРОКА
         // ============================================
         const playerId = player.id || player.telegram_id || Date.now().toString();
         const rawPlayerName = player.nickname || player.name || 'Player';
         
-        // Транслитерируем имя
+        // Транслитерируем имя для отображения
         const playerNameLatin = transliterate(rawPlayerName);
         const cleanPlayerName = playerNameLatin.replace(/[^a-zA-Z0-9]/g, '');
         const finalPlayerName = cleanPlayerName || 'Player';
         
-        // ВАРИАНТ 1: Только ID (самый простой)
-        const qrDataSimple = playerId;
+        // QR КОД: ТОЛЬКО ID (цифры или буквенно-цифровой ID)
+        // Важно: используем реальный ID, который есть в данных!
+        const qrData = playerId;
         
-        // ВАРИАНТ 2: ID/Name (если нужно имя)
-        // const qrDataSimple = `${playerId}/${finalPlayerName}`;
-        
-        console.log('📱 QR данные (только цифры):', qrDataSimple);
+        console.log('📱 QR данные:', qrData);
+        console.log('📱 ID игрока:', playerId);
         
         // Отображаем информацию
         document.getElementById('playerName').innerText = rawPlayerName;
@@ -225,29 +242,31 @@
         
         document.getElementById('debugInfo').innerHTML = `
             📦 QR содержит:<br>
-            <strong style="color:#ffcc33;">${qrDataSimple}</strong><br>
+            <strong style="color:#ffcc33; font-size:12px;">${qrData}</strong><br>
             <br>
-            ✅ Формат: только ID (цифры)<br>
-            📏 Длина: ${qrDataSimple.length} символов<br>
-            🔤 Имя в QR: ${finalPlayerName}
+            ✅ Формат: ID игрока<br>
+            📏 Длина: ${qrData.length} символов<br>
+            ⚠️ Убедитесь, что QR код полностью видим!<br>
+            ⚠️ Углы QR кода не должны быть обрезаны!
         `;
         
-        // Генерируем QR код (только цифры)
+        // Генерируем QR код
         const qrContainer = document.getElementById('qrcode');
         qrContainer.innerHTML = '';
         
         try {
             new QRCode(qrContainer, {
-                text: qrDataSimple,
-                width: 220,
-                height: 220,
+                text: qrData,
+                width: 280,
+                height: 280,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.L  // Самый простой уровень
+                correctLevel: QRCode.CorrectLevel.H  // Высокий уровень для надёжности
             });
-            console.log('✅ QR создан (только цифры):', qrDataSimple);
+            console.log('✅ QR создан, данные:', qrData);
         } catch (error) {
             console.error('❌ Ошибка:', error);
+            document.getElementById('debugInfo').innerHTML += '<br><span style="color:#ff4444;">⚠️ Ошибка генерации QR</span>';
         }
     </script>
 </body>
