@@ -68,13 +68,13 @@ const RANKS = [
 function getRankByXp(xp) {
     if (!RANKS.length) return { id: 0, title: "Без звания", league: "Новичок", xp: 0 };
     
-    let currentRank = RANKS[0]; // Начинаем с первого звания
+    let currentRank = RANKS[0];
     
     for (const rank of RANKS) {
         if (xp >= rank.xp) {
-            currentRank = rank; // Если опыта хватает на это звание, запоминаем его
+            currentRank = rank;
         } else {
-            break; // Как только опыта перестало хватать - выходим
+            break;
         }
     }
     
@@ -85,79 +85,95 @@ function getRankByXp(xp) {
 function getNextRank(currentXp) {
     for (const rank of RANKS) {
         if (rank.xp > currentXp) {
-            return rank; // Возвращаем первое звание, на которое не хватает опыта
+            return rank;
         }
     }
-    return null; // Достигнут максимум (60-е звание)
+    return null;
 }
 
-// Функция форматирования чисел (добавляет пробелы между разрядами)
+// Функция форматирования чисел
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-// Получаем данные игрока из localStorage
-const player = JSON.parse(localStorage.getItem('holostim_player'));
+// ============================================
+// ПОЛУЧАЕМ ДАННЫЕ ИГРОКА
+// ============================================
+
+let player = JSON.parse(localStorage.getItem('holostim_player'));
 
 // Если игрока нет - отправляем на онбординг
 if (!player) {
     window.location.href = 'index.html';
 }
 
-// Добавляем опыт, если его нет (для теста можно задать значение)
-// В реальности опыт будет приходить из бота или начисляться за сессии
-if (player.xp === undefined) {
-    player.xp = 25; // Тестовое значение - между 1 и 2 званием (10 и 30 XP)
+// ============================================
+// ВАЖНО: Сохраняем Telegram ID если он есть
+// ============================================
+
+// Проверяем, есть ли Telegram ID в данных
+// Если нет, но есть в Telegram Web App — сохраняем
+if (!player.telegram_id && window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    const user = tg.initDataUnsafe?.user;
+    if (user && user.id) {
+        player.telegram_id = user.id.toString();
+        player.id = player.telegram_id;  // Используем Telegram ID как основной
+        console.log('✅ Сохранён Telegram ID:', player.telegram_id);
+    }
 }
 
-// Добавляем статистику сессий, если её нет
+// Убеждаемся, что у игрока есть id (Telegram ID или временный)
+if (!player.id) {
+    player.id = player.telegram_id || Date.now().toString();
+}
+
+// ============================================
+// ДОБАВЛЯЕМ ТЕСТОВЫЕ ДАННЫЕ (если нет)
+// ============================================
+
+if (player.xp === undefined) {
+    player.xp = 25;
+}
+
 if (player.sessions === undefined) {
-    player.sessions = 12; // Тестовое значение
+    player.sessions = 12;
 }
 
 if (player.accuracy === undefined) {
-    player.accuracy = 68; // Тестовое значение
+    player.accuracy = 68;
 }
 
-// Получаем текущее и следующее звание
+// ============================================
+// ОТОБРАЖАЕМ ДАННЫЕ В ИНТЕРФЕЙСЕ
+// ============================================
+
 const currentRank = getRankByXp(player.xp);
 const nextRank = getNextRank(player.xp);
 
-// Расчет прогресса XP для шкалы
+// Расчет прогресса XP
 let xpProgress = 0;
 let xpNeeded = 0;
 let progressPercent = 0;
 
 if (nextRank) {
-    // Есть следующее звание
     xpNeeded = nextRank.xp - currentRank.xp;
     xpProgress = player.xp - currentRank.xp;
     progressPercent = (xpProgress / xpNeeded) * 100;
 } else {
-    // Достигнут максимум (60-е звание)
     progressPercent = 100;
 }
 
 // Обновляем элементы интерфейса
-// Основная информация
 document.getElementById('nickname').innerText = player.nickname || 'PLAYER';
 
-// Проверяем, есть ли новый элемент rankTitle (если нет, используем level)
 const rankTitleElement = document.getElementById('rankTitle');
 if (rankTitleElement) {
     rankTitleElement.innerText = currentRank.title;
-} else {
-    // Для обратной совместимости
-    const levelElement = document.getElementById('level');
-    if (levelElement) {
-        levelElement.innerText = currentRank.title;
-    }
 }
 
-// Лига
 document.getElementById('league').innerText = currentRank.league;
 
-// Следующее звание (если есть такой элемент)
 const nextRankElement = document.getElementById('nextRank');
 const xpNeededElement = document.getElementById('xpNeeded');
 
@@ -178,13 +194,11 @@ if (xpNeededElement) {
     }
 }
 
-// Шкала XP
 const xpFill = document.getElementById('xpFill');
 if (xpFill) {
     xpFill.style.width = progressPercent + '%';
 }
 
-// Текст XP
 const xpText = document.getElementById('xpText');
 if (xpText) {
     if (nextRank) {
@@ -194,7 +208,6 @@ if (xpText) {
     }
 }
 
-// Статистика (сессии и точность)
 const sessionsCount = document.getElementById('sessionsCount');
 const accuracyElement = document.getElementById('accuracy');
 
@@ -208,21 +221,36 @@ if (accuracyElement) {
 
 // Фон по полу
 const bg = document.getElementById('account-bg');
-
 if (bg) {
     if (player.gender === 'male') {
         bg.style.backgroundImage = "url('assets/img/wick_male.jpg')";
     } else if (player.gender === 'female') {
         bg.style.backgroundImage = "url('assets/img/wick_female.jpg')";
     } else {
-        // Если пол не выбран, ставим градиент
         bg.style.background = "linear-gradient(135deg, #1a1a2e, #16213e)";
     }
 }
 
-// Кнопка сброса (dev режим)
-const resetBtn = document.getElementById('dev-reset-btn');
+// ============================================
+// СОХРАНЯЕМ ОБНОВЛЁННЫЕ ДАННЫЕ
+// ============================================
 
+localStorage.setItem('holostim_player', JSON.stringify(player));
+
+// ============================================
+// ФУНКЦИЯ НАЧАЛА БОЯ
+// ============================================
+
+window.startBattle = function() {
+    // Сохраняем ID игрока перед переходом
+    localStorage.setItem('holostim_player', JSON.stringify(player));
+    
+    // Переходим на страницу QR-кода
+    window.location.href = 'show-qr.html';
+};
+
+// Кнопка сброса
+const resetBtn = document.getElementById('dev-reset-btn');
 if (resetBtn) {
     resetBtn.onclick = () => {
         if (confirm('Сбросить аккаунт? Весь прогресс будет потерян.')) {
@@ -232,30 +260,71 @@ if (resetBtn) {
     };
 }
 
-// Функция начала боя (будет вызвана из HTML)
-window.startBattle = function() {
-    // Здесь можно добавить анимацию или звук
-    alert('⚡ РЕЖИМ БОЯ\n\nСкоро ты сможешь зарабатывать XP и открывать новые звания!');
-    
-    // Для теста можно добавить опыт
-    // player.xp += 10;
-    // localStorage.setItem('holostim_player', JSON.stringify(player));
-    // location.reload(); // Перезагружаем страницу для обновления данных
-};
-
-// Сохраняем обновленные данные игрока обратно в localStorage
-// (чтобы сохранить тестовые значения)
-localStorage.setItem('holostim_player', JSON.stringify(player));
-
-// Выводим в консоль для отладки (можно удалить в продакшене)
-console.log('Player data:', player);
-console.log('Current rank:', currentRank);
-console.log('Next rank:', nextRank);
-console.log('XP progress:', xpProgress, '/', xpNeeded, '(', progressPercent.toFixed(1), '%)');
-// Получаем своё место в рейтинге
+// Место в рейтинге
 const playerRank = localStorage.getItem('player_rating_position');
 const playerRankElement = document.getElementById('playerRank');
-
 if (playerRankElement && playerRank) {
     playerRankElement.innerText = '#' + playerRank;
 }
+
+// Загружаем статистику с ПК
+async function loadPCStats() {
+    const pcIP = localStorage.getItem('holostim_pc_ip');
+    if (!pcIP) return;
+
+    try {
+        const response = await fetch(`http://${pcIP}:8000/api/session/current`);
+        const data = await response.json();
+
+        if (!data.error && data.player_name) {
+            if (data.started) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    left: 20px;
+                    right: 20px;
+                    background: linear-gradient(90deg, #ffcc33, #ff9f43);
+                    color: #000;
+                    padding: 12px;
+                    border-radius: 999px;
+                    text-align: center;
+                    font-weight: 600;
+                    z-index: 100;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                `;
+                notification.innerText = `🎯 Активная сессия: ${data.player_name} (${data.shots} выстрелов)`;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 5000);
+            }
+        }
+    } catch (error) {
+        // Игнорируем ошибки
+    }
+}
+
+// Показываем кнопку сброса
+function showResetButton() {
+    const devBtn = document.getElementById('dev-reset-btn');
+    if (devBtn) {
+        devBtn.classList.add('visible');
+        devBtn.classList.add('pulse');
+        setTimeout(() => {
+            devBtn.classList.remove('pulse');
+        }, 5000);
+        console.log('✅ Кнопка сброса активирована');
+    }
+}
+
+// Запускаем после загрузки
+document.addEventListener('DOMContentLoaded', function() {
+    loadPCStats();
+    showResetButton();
+});
+
+setTimeout(showResetButton, 1000);
+
+// Вывод в консоль для отладки
+console.log('🎮 Player data:', player);
+console.log('📊 Current rank:', currentRank);
+console.log('📈 Next rank:', nextRank);
