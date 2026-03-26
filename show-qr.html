@@ -251,7 +251,287 @@
         `;
         
         // Генерируем QR код
+        const qrContainer = document.getElementById('qrcode')<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Holostim — Ваш QR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: radial-gradient(circle at center, #0a0e1a 0%, #03050a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 360px;
+            width: 100%;
+        }
+        
+        .player-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .player-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffcc33;
+            margin-bottom: 6px;
+        }
+        
+        .player-id {
+            font-size: 11px;
+            color: #9aa3b5;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        /* Убираем круглую рамку! QR должен быть полностью видим */
+        .qr-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 10px auto;
+            display: inline-block;
+            box-shadow: 0 0 20px rgba(255,204,51,0.3);
+            /* НЕТ обрезания! */
+        }
+        
+        /* QR код на белом фоне, полностью видимый */
+        #qrcode canvas {
+            width: 280px !important;
+            height: 280px !important;
+            display: block;
+            /* НЕТ border-radius, чтобы углы не обрезались! */
+        }
+        
+        .status {
+            margin: 16px 0;
+        }
+        
+        .status-text {
+            font-size: 18px;
+            color: #ffcc33;
+            font-weight: bold;
+        }
+        
+        .status-detail {
+            font-size: 13px;
+            color: #9aa3b5;
+            margin-top: 4px;
+        }
+        
+        .instruction {
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .instruction-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #fff;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #ffcc33;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 22px;
+            z-index: 100;
+        }
+        
+        .debug-info {
+            background: rgba(0,0,0,0.5);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 16px;
+            font-size: 10px;
+            font-family: monospace;
+            color: #5f6a7e;
+            word-break: break-all;
+            text-align: left;
+        }
+        
+        /* Адаптация для маленьких экранов */
+        @media (max-width: 450px) {
+            #qrcode canvas {
+                width: 240px !important;
+                height: 240px !important;
+            }
+            .qr-wrapper {
+                padding: 16px;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <a href="account.html" class="back-btn">←</a>
+    
+    <div class="container">
+        <div class="player-card">
+            <div class="player-name" id="playerName">Загрузка...</div>
+            <div class="player-id" id="playerId">ID: ---</div>
+        </div>
+        
+        <!-- Убрана круглая рамка! QR полностью видим -->
+        <div class="qr-wrapper">
+            <div id="qrcode"></div>
+        </div>
+        
+        <div class="status">
+            <div class="status-text">🎯 Поднесите сканер</div>
+            <div class="status-detail">Сканер должен считать QR код полностью</div>
+        </div>
+        
+        <div class="instruction">
+            <div class="instruction-step">
+                <span class="step-number">1</span>
+                <span>Покажите этот QR код сканеру</span>
+            </div>
+            <div class="instruction-step">
+                <span class="step-number">2</span>
+                <span>Сканер передаст ID в программу</span>
+            </div>
+            <div class="instruction-step">
+                <span class="step-number">3</span>
+                <span>Игра начнётся автоматически</span>
+            </div>
+        </div>
+        
+        <div class="debug-info" id="debugInfo"></div>
+    </div>
+    
+    <script>
+        // Функция транслитерации (оставлена для отображения имени, но в QR не используется)
+        function transliterate(name) {
+            const map = {
+                'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'E',
+                'Ж': 'ZH', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M',
+                'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U',
+                'Ф': 'F', 'Х': 'H', 'Ц': 'TS', 'Ч': 'CH', 'Ш': 'SH', 'Щ': 'SCH',
+                'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'YU', 'Я': 'YA',
+                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e',
+                'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+                'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+            };
+            return name.split('').map(char => map[char] || char).join('');
+        }
+        
+        // Получаем данные игрока
+        const player = JSON.parse(localStorage.getItem('holostim_player'));
+        
+        if (!player) {
+            window.location.href = 'index.html';
+        }
+        
+        // ============================================
+        // ВАЖНО: ИЗВЛЕКАЕМ ТОЛЬКО ЦИФРЫ ИЗ ID
+        // ============================================
+        const rawPlayerId = player.id || player.telegram_id || Date.now().toString();
+        const rawPlayerName = player.nickname || player.name || 'Player';
+        
+        // Извлекаем ТОЛЬКО цифры из ID (для сканера STINI)
+        const numericId = rawPlayerId.replace(/[^0-9]/g, '');
+        
+        // Если есть цифры — используем их, иначе используем весь ID
+        const playerId = numericId || rawPlayerId;
+        
+        console.log('📱 Оригинальный ID:', rawPlayerId);
+        console.log('📱 Числовой ID для QR:', playerId);
+        
+        // Транслитерируем имя для отображения
+        const playerNameLatin = transliterate(rawPlayerName);
+        const cleanPlayerName = playerNameLatin.replace(/[^a-zA-Z0-9]/g, '');
+        const finalPlayerName = cleanPlayerName || 'Player';
+        
+        // QR КОД: ТОЛЬКО ЦИФРЫ (для совместимости со сканером STINI)
+        const qrData = playerId;
+        
+        console.log('📱 QR данные (только цифры):', qrData);
+        
+        // Отображаем информацию
+        document.getElementById('playerName').innerText = rawPlayerName;
+        document.getElementById('playerId').innerHTML = `🆔 ID: ${rawPlayerId}<br><span style="font-size:9px; color:#ffcc33;">QR содержит: ${qrData}</span>`;
+        
+        document.getElementById('debugInfo').innerHTML = `
+            📦 QR содержит:<br>
+            <strong style="color:#ffcc33; font-size:14px;">${qrData}</strong><br>
+            <br>
+            ✅ Формат: ТОЛЬКО ЦИФРЫ<br>
+            📏 Длина: ${qrData.length} символов<br>
+            🔢 Оригинальный ID: ${rawPlayerId}<br>
+            ⚠️ Убедитесь, что QR код полностью видим!<br>
+            ⚠️ Углы QR кода не должны быть обрезаны!
+        `;
+        
+        // Генерируем QR код
         const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = '';
+        
+        try {
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 280,
+                height: 280,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H  // Высокий уровень для надёжности
+            });
+            console.log('✅ QR создан, данные (только цифры):', qrData);
+        } catch (error) {
+            console.error('❌ Ошибка:', error);
+            document.getElementById('debugInfo').innerHTML += '<br><span style="color:#ff4444;">⚠️ Ошибка генерации QR</span>';
+        }
+    </script>
+</body>
+</html>
         qrContainer.innerHTML = '';
         
         try {
