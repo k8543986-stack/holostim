@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Holostim — Ваш QR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Holostim — Ваш QR</title>
     <style>
         * {
             margin: 0;
@@ -17,57 +17,49 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             padding: 20px;
         }
         
         .container {
             text-align: center;
-            max-width: 400px;
+            max-width: 350px;
             width: 100%;
         }
         
         .player-card {
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
-            border-radius: 32px;
+            border-radius: 28px;
             padding: 16px;
             margin-bottom: 16px;
-            border: 1px solid rgba(255,204,51,0.2);
         }
         
         .player-name {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
-            background: linear-gradient(135deg, #fff, #ffcc33);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #ffcc33;
             margin-bottom: 6px;
         }
         
         .player-id {
-            font-size: 12px;
+            font-size: 11px;
             color: #9aa3b5;
             font-family: monospace;
         }
         
-        /* Тонкая рамка с закруглёнными краями */
         .qr-wrapper {
             background: white;
-            padding: 8px;  /* Ещё тоньше */
+            padding: 12px;
             border-radius: 24px;
             margin: 16px auto;
-            box-shadow: 0 0 30px rgba(255,204,51,0.3);
             display: inline-block;
-            width: auto;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 20px rgba(255,204,51,0.3);
         }
         
-        /* УМЕНЬШЕННЫЙ QR-код в 2 раза (было 480px → 240px) */
         #qrcode canvas {
-            width: 240px !important;
-            height: 240px !important;
+            width: 220px !important;
+            height: 220px !important;
             display: block;
             border-radius: 16px;
         }
@@ -77,21 +69,21 @@
         }
         
         .status-text {
-            font-size: 18px;
+            font-size: 16px;
             color: #ffcc33;
             font-weight: bold;
-            margin-bottom: 6px;
         }
         
         .status-detail {
-            font-size: 13px;
+            font-size: 12px;
             color: #9aa3b5;
+            margin-top: 4px;
         }
         
         .instruction {
             background: rgba(0,0,0,0.4);
             border-radius: 20px;
-            padding: 16px;
+            padding: 14px;
             margin-top: 16px;
             text-align: left;
         }
@@ -100,14 +92,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 10px 0;
-            font-size: 13px;
+            margin: 8px 0;
+            font-size: 12px;
             color: #fff;
         }
         
         .step-number {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             background: #ffcc33;
             color: #000;
             border-radius: 50%;
@@ -115,15 +107,15 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
         
         .back-btn {
             position: fixed;
             top: 20px;
             left: 20px;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             background: rgba(0,0,0,0.6);
             border-radius: 50%;
             display: flex;
@@ -131,62 +123,18 @@
             justify-content: center;
             color: white;
             text-decoration: none;
-            font-size: 22px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.2s;
-            z-index: 100;
-        }
-        
-        .back-btn:hover {
-            background: rgba(255,204,51,0.3);
-            transform: scale(1.05);
+            font-size: 20px;
         }
         
         .debug-info {
             background: rgba(0,0,0,0.5);
             border-radius: 12px;
-            padding: 10px;
-            margin-top: 16px;
-            font-size: 10px;
+            padding: 8px;
+            margin-top: 12px;
+            font-size: 9px;
             font-family: monospace;
             color: #5f6a7e;
-            text-align: left;
             word-break: break-all;
-        }
-        
-        /* Адаптация для очень маленьких экранов */
-        @media (max-width: 380px) {
-            .container {
-                max-width: 320px;
-            }
-            #qrcode canvas {
-                width: 200px !important;
-                height: 200px !important;
-            }
-            .qr-wrapper {
-                padding: 6px;
-            }
-            .player-name {
-                font-size: 20px;
-            }
-        }
-        
-        /* Анимация для рамки */
-        @keyframes subtleGlow {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255,204,51,0.2);
-            }
-            70% {
-                box-shadow: 0 0 0 6px rgba(255,204,51,0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255,204,51,0);
-            }
-        }
-        
-        .qr-wrapper {
-            animation: subtleGlow 2s infinite;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -205,22 +153,22 @@
         </div>
         
         <div class="status">
-            <div class="status-text">🎯 Ожидание сканирования</div>
-            <div class="status-detail">Поднесите сканер к экрану</div>
+            <div class="status-text">🎯 Поднесите сканер</div>
+            <div class="status-detail">Сканер должен прочитать QR код</div>
         </div>
         
         <div class="instruction">
             <div class="instruction-step">
                 <span class="step-number">1</span>
-                <span>Держите телефон экраном к сканеру</span>
+                <span>Покажите этот QR код сканеру</span>
             </div>
             <div class="instruction-step">
                 <span class="step-number">2</span>
-                <span>Bluetooth сканер считает QR код</span>
+                <span>Сканер передаст ID в программу</span>
             </div>
             <div class="instruction-step">
                 <span class="step-number">3</span>
-                <span>Сессия запустится автоматически</span>
+                <span>Игра начнётся автоматически</span>
             </div>
         </div>
         
@@ -228,7 +176,7 @@
     </div>
     
     <script>
-        // Функция транслитерации (русские буквы → латиница)
+        // Функция транслитерации
         function transliterate(name) {
             const map = {
                 'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'E',
@@ -236,11 +184,11 @@
                 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U',
                 'Ф': 'F', 'Х': 'H', 'Ц': 'TS', 'Ч': 'CH', 'Ш': 'SH', 'Щ': 'SCH',
                 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'YU', 'Я': 'YA',
-                'а': 'A', 'б': 'B', 'в': 'V', 'г': 'G', 'д': 'D', 'е': 'E', 'ё': 'E',
-                'ж': 'ZH', 'з': 'Z', 'и': 'I', 'й': 'Y', 'к': 'K', 'л': 'L', 'м': 'M',
-                'н': 'N', 'о': 'O', 'п': 'P', 'р': 'R', 'с': 'S', 'т': 'T', 'у': 'U',
-                'ф': 'F', 'х': 'H', 'ц': 'TS', 'ч': 'CH', 'ш': 'SH', 'щ': 'SCH',
-                'ъ': '', 'ы': 'Y', 'ь': '', 'э': 'E', 'ю': 'YU', 'я': 'YA'
+                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e',
+                'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+                'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
             };
             return name.split('').map(char => map[char] || char).join('');
         }
@@ -249,76 +197,58 @@
         const player = JSON.parse(localStorage.getItem('holostim_player'));
         
         if (!player) {
-            console.error('❌ Игрок не найден, перенаправление...');
             window.location.href = 'index.html';
         }
         
         // ============================================
-        // ⚡ УПРОЩЁННЫЙ QR-КОД (только латиница и цифры)
+        // УПРОЩЁННЫЙ QR — ТОЛЬКО ЦИФРЫ (ID)
         // ============================================
-        const playerId = player.id || player.telegram_id || '123456789';
+        const playerId = player.id || player.telegram_id || Date.now().toString();
         const rawPlayerName = player.nickname || player.name || 'Player';
         
-        // Транслитерация имени (Рон → Ron)
+        // Транслитерируем имя
         const playerNameLatin = transliterate(rawPlayerName);
-        
-        // Убираем всё кроме латиницы и цифр
         const cleanPlayerName = playerNameLatin.replace(/[^a-zA-Z0-9]/g, '');
-        
-        // Если имя пустое после очистки, используем "Player"
         const finalPlayerName = cleanPlayerName || 'Player';
         
-        // ✅ ПРОСТОЙ QR-КОД: holostim://ID/NAME
-        // Пример: holostim://123456789/Ron
-        const qrData = `holostim://${playerId}/${finalPlayerName}`;
+        // ВАРИАНТ 1: Только ID (самый простой)
+        const qrDataSimple = playerId;
+        
+        // ВАРИАНТ 2: ID/Name (если нужно имя)
+        // const qrDataSimple = `${playerId}/${finalPlayerName}`;
+        
+        console.log('📱 QR данные (только цифры):', qrDataSimple);
         
         // Отображаем информацию
         document.getElementById('playerName').innerText = rawPlayerName;
         document.getElementById('playerId').innerHTML = `🆔 ID: ${playerId}`;
         
-        // Отладочная информация
         document.getElementById('debugInfo').innerHTML = `
-            📦 ДАННЫЕ В QR-КОДЕ:<br>
-            <strong style="color:#ffcc33; font-size:12px;">${qrData}</strong><br>
+            📦 QR содержит:<br>
+            <strong style="color:#ffcc33;">${qrDataSimple}</strong><br>
             <br>
-            ✅ Формат: holostim://ID/ИМЯ<br>
-            ✅ Только латиница и цифры<br>
-            📏 Длина: ${qrData.length} символов<br>
-            📐 Размер QR: 240x240 px (уменьшен в 2 раза)<br>
+            ✅ Формат: только ID (цифры)<br>
+            📏 Длина: ${qrDataSimple.length} символов<br>
             🔤 Имя в QR: ${finalPlayerName}
         `;
         
-        console.log('✅ Генерация упрощённого QR-кода');
-        console.log('📊 Данные:', qrData);
-        console.log('📐 Размер QR: 240x240 px');
-        
-        // Очищаем контейнер
+        // Генерируем QR код (только цифры)
         const qrContainer = document.getElementById('qrcode');
         qrContainer.innerHTML = '';
         
-        // Создаём УМЕНЬШЕННЫЙ QR-код (240x240)
         try {
             new QRCode(qrContainer, {
-                text: qrData,
-                width: 240,              // Уменьшено с 480 до 240 (в 2 раза)
-                height: 240,
+                text: qrDataSimple,
+                width: 220,
+                height: 220,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M  // Средний уровень для лучшего сканирования
+                correctLevel: QRCode.CorrectLevel.L  // Самый простой уровень
             });
-            console.log('✅ QR-код создан, размер 240x240');
+            console.log('✅ QR создан (только цифры):', qrDataSimple);
         } catch (error) {
-            console.error('❌ Ошибка создания QR:', error);
-            document.getElementById('debugInfo').innerHTML += '<br><span style="color:#ff4444;">⚠️ Ошибка генерации QR</span>';
+            console.error('❌ Ошибка:', error);
         }
-        
-        // Проверка создания
-        setTimeout(() => {
-            const canvas = document.querySelector('#qrcode canvas');
-            if (canvas) {
-                console.log('✅ Canvas загружен, размер:', canvas.width, 'x', canvas.height);
-            }
-        }, 100);
     </script>
 </body>
 </html>
